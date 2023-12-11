@@ -4,7 +4,9 @@
 Enemies::Enemies() {
   for (uint8_t i = 0; i < ENEMIES; i++) {
     enemies[i].type = EnemyType::HEAD;
+    enemies[i].active = false;
   }
+  score = 0;
 }
 
 void dbf Enemies::tick() {

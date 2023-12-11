@@ -20,6 +20,16 @@ void Ship::run() {
     }
     ticker = 0;
   }
+
+  for (uint8_t i = 0; i < ENEMIES; i++) {
+    if (enemies[i].active) {
+      if (getBound().overlap(enemies[i].getBounding())) {
+        *state = GameState::LOSE;
+        break;
+      }
+    }
+  }
+
   draw();
   move();
   littleShip();
@@ -106,3 +116,5 @@ void Ship::bulletTick() {
     }
   }
 }
+
+BoundBox Ship::getBound() { return BoundBox(x, y, 16, 16); }

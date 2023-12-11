@@ -1,8 +1,10 @@
 #pragma once
+#include "bullet.hpp"
+#include "enemy.hpp"
+#include "gamestate.hpp"
+#include "lib/boundBox.hpp"
 #include <Arduboy2.h>
 #include <stdint.h>
-
-#include "bullet.hpp"
 
 class Ship {
 public:
@@ -12,6 +14,8 @@ public:
   bool littleShips;
   uint8_t littleShipIndex;
   Bullet *playerBullets;
+  Enemy *enemies;
+  GameState *state;
 
   Ship();
   void run();
@@ -19,4 +23,6 @@ public:
   void move();
   void littleShip();
   void bulletTick();
+  BoundBox getBound();
+  bool hit(BoundBox enemy);
 };
