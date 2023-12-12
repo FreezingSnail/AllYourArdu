@@ -4,26 +4,27 @@
 #include <stdint.h>
 
 enum class Pattern {
-  STRAIGHT,
-  ZIGZAG,
+    STRAIGHT,
+    ZIGZAG,
 };
 
 enum class EnemyType {
-  HEAD,
+    HEAD,
 };
 
 class Enemy {
-public:
-  int16_t x, y;
-  Pattern pattern;
-  bool active;
-  EnemyType type;
-  uint8_t ticker;
+  public:
+    int16_t x, y;
+    Pattern pattern;
+    bool active;
+    EnemyType type;
+    uint8_t ticker;
 
-  void tick();
-  void draw();
-  void spawn(uint8_t y);
-  void despawn();
-  BoundBox getBounding();
-  bool hit(BoundBox bulletBox);
+    void tick();
+    void draw();
+    void spawn(uint8_t y);
+    void despawn();
+    BoundBox getBounding();
+    bool hit(BoundBox bulletBox);
+    void reset();
 };
