@@ -16,4 +16,5 @@ class Enemies {
 
     Enemies();
     void tick();
+    void spawn(EnemyType type, uint8_t x, uint8_t y);
 };

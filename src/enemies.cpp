@@ -9,7 +9,7 @@ Enemies::Enemies() {
     score = 0;
 }
 
-void dbf Enemies::tick() {
+void Enemies::tick() {
     ticker++;
     if (ticker % 60 == 0) {
         powerupTimer++;
@@ -25,27 +25,23 @@ void dbf Enemies::tick() {
     for (uint8_t i = 0; i < ENEMIES; i++) {
         enemies[i].tick();
         for (uint8_t j = 0; j < BULLETCOUNT; j++) {
-            bool hit = false;
             if (playerBullets[j].active) {
                 if (enemies[i].hit(playerBullets[j].getBounding())) {
                     enemies[i].reset();
                     playerBullets[j].reset();
                     score++;
-                    hit = true;
-                    continue;
+                    break;
                 }
-            }
-            if (hit) {
-                break;
             }
         }
     }
-    if (ticker % 40 == 0) {
-        for (uint8_t i = 0; i < ENEMIES; i++) {
-            if (!enemies[i].active) {
-                enemies[i].spawn((rand() % 50 + 10));
-                break;
-            }
+}
+
+void Enemies::spawn(EnemyType type, uint8_t x, uint8_t y) {
+    for (uint8_t i = 0; i < ENEMIES; i++) {
+        if (!enemies[i].active) {
+            enemies[i].spawn(type, x, y);
+            return;
         }
     }
 }

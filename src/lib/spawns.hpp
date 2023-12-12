@@ -1,0 +1,17 @@
+#pragma once;
+#include "types.hpp"
+#include <stdint.h>
+
+struct Spawns {
+    EnemyType type;
+    uint8_t count;
+    uint8_t tickInterval;
+};
+
+const Spawns emptySpawn{EnemyType::NONE, 0, 0};
+
+const Spawns lineSpiral = {EnemyType::SPIRAL, 4, 15};
+
+const Spawns Ovals = {EnemyType::OVAL, 6, 15};
+
+const Spawns SmallShips = {EnemyType::SMALLSHIP, 6, 15};

@@ -1,16 +1,9 @@
 #pragma once
 #include "lib/boundBox.hpp"
+#include "lib/paths.hpp"
+#include "lib/types.hpp"
 #include <Arduboy2.h>
 #include <stdint.h>
-
-enum class Pattern {
-    STRAIGHT,
-    ZIGZAG,
-};
-
-enum class EnemyType {
-    HEAD,
-};
 
 class Enemy {
   public:
@@ -19,12 +12,16 @@ class Enemy {
     bool active;
     EnemyType type;
     uint8_t ticker;
+    uint8_t frame;
+    uint8_t stepCount;
+    uint8_t stepPointer;
 
     void tick();
     void draw();
-    void spawn(uint8_t y);
+    void spawn(EnemyType type, uint8_t x, uint8_t y);
     void despawn();
     BoundBox getBounding();
     bool hit(BoundBox bulletBox);
     void reset();
+    void applyPath(Path p);
 };
