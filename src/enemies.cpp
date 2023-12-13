@@ -21,26 +21,21 @@ void Enemies::tick() {
     }
 
     powerups.draw();
-
-    for (uint8_t i = 0; i < ENEMIES; i++) {
-        enemies[i].tick();
-        for (uint8_t j = 0; j < BULLETCOUNT; j++) {
-            if (playerBullets[j].active) {
-                if (enemies[i].hit(playerBullets[j].getBounding())) {
-                    enemies[i].reset();
-                    playerBullets[j].reset();
-                    score++;
-                    break;
-                }
-            }
-        }
-    }
 }
 
 void Enemies::spawn(EnemyType type, uint8_t x, uint8_t y) {
     for (uint8_t i = 0; i < ENEMIES; i++) {
         if (!enemies[i].active) {
             enemies[i].spawn(type, x, y);
+            return;
+        }
+    }
+}
+
+void dbf Enemies::spawnBrokenWall(EnemyType type, int16_t x, int16_t y, uint16_t stepCounter, uint8_t stepPointer) {
+    for (uint8_t i = 0; i < ENEMIES; i++) {
+        if (!enemies[i].active) {
+            enemies[i].spawnBrokenWall(type, x, y, stepCounter, stepPointer);
             return;
         }
     }

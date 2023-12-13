@@ -24,6 +24,7 @@ class Ship {
     ShipType powerups[8];
     int8_t powerupPointer;
     Arduboy2 *arduboy;
+    Formation formation;
 
     void init();
     void run();
@@ -33,7 +34,7 @@ class Ship {
     void bulletTick();
     void spawnBulletShip(ShipType type);
     BoundBox getBound();
-    bool hit(BoundBox enemy);
     void pushPower(ShipType type);
     void popPower();
+    void formChange();
 };

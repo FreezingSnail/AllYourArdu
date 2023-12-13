@@ -21,4 +21,5 @@ class Bullet {
     void start(uint8_t x, uint8_t y, uint8_t type);
     void reset();
     BoundBox getBounding();
+    void move();
 };

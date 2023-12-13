@@ -15,3 +15,5 @@ const Spawns lineSpiral = {EnemyType::SPIRAL, 4, 15};
 const Spawns Ovals = {EnemyType::OVAL, 6, 15};
 
 const Spawns SmallShips = {EnemyType::SMALLSHIP, 6, 15};
+
+const Spawns WallEnemy = {EnemyType::WALL, 1, 1};

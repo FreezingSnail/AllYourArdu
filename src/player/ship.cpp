@@ -31,9 +31,8 @@ void Ship::init() {
     this->pushPower(ShipType::EYE);
     this->pushPower(ShipType::BOMB);
 
-    lilShips[0].spawn(&x, &y);
-    lilShips[0].top = true;
-    lilShips[1].spawn(&x, &y);
+    lilShips[0].spawn(&x, &y, 0, -10);
+    lilShips[1].spawn(&x, &y, 0, 18);
 }
 
 void Ship::run() {
@@ -50,17 +49,9 @@ void Ship::run() {
         }
     }
 
-    for (uint8_t i = 0; i < ENEMIES; i++) {
-        if (enemies[i].active) {
-            if (getBound().overlap(enemies[i].getBounding())) {
-                //*state = GameState::LOSE;
-                break;
-            }
-        }
-    }
-
     if (getBound().overlap(powerup->getBound())) {
         powerup->despawn();
+        spawnBulletShip(powerup->type);
         pushPower(powerup->type);
     }
 
@@ -110,14 +101,15 @@ void dbf Ship::move() {
 }
 
 void Ship::littleShip() {
-    lilShips[0].tick();
-    lilShips[1].tick();
+    lilShips[0].tick(enemies);
+    lilShips[1].tick(enemies);
 
     if (Arduboy2::justPressed(B_BUTTON)) {
-        if (powerupPointer >= 0) {
-            spawnBulletShip(powerups[0]);
-            popPower();
-        }
+        formChange();
+        // if (powerupPointer >= 0) {
+        //     spawnBulletShip(powerups[0]);
+        //     popPower();
+        // }
     }
 }
 
@@ -133,17 +125,19 @@ void Ship::bulletTick() {
                 break;
             }
         }
-        if (littleShips) {
+        if (lilShips[0].active) {
             for (uint8_t i = 0; i < BULLETCOUNT; i++) {
                 if (!playerBullets[i].active) {
-                    playerBullets[i].start(x + 2, y - 6, littleShipIndex);
+                    playerBullets[i].start(lilShips[0].getX() + 4, lilShips[0].getY() + 4, littleShipIndex);
                     break;
                 }
             }
-            for (uint8_t i = 0; i < BULLETCOUNT; i++) {
-                if (!playerBullets[i].active) {
-                    playerBullets[i].start(x + 2, y + 22, littleShipIndex);
-                    break;
+            if (lilShips[1].active) {
+                for (uint8_t i = 0; i < BULLETCOUNT; i++) {
+                    if (!playerBullets[i].active) {
+                        playerBullets[i].start(lilShips[1].getX() + 4, lilShips[1].getY() + 4, littleShipIndex);
+                        break;
+                    }
                 }
             }
         }
@@ -175,4 +169,36 @@ void Ship::popPower() {
         powerups[i] = powerups[i + 1];
     }
     powerupPointer--;
+}
+
+void Ship::formChange() {
+    formation = Formation(uint8_t(formation) + 1);
+    if (formation == Formation::NONE)
+        formation = Formation(0);
+
+    switch (formation) {
+    // case Formation::TIGHT:
+    //     lilShips[0].setChange(-8, -2);
+    //     lilShips[1].setChange(-8, 10);
+    //     break;
+    case Formation::WIDE:
+        lilShips[0].setChange(0, -10, Formation::TOP);
+        lilShips[1].setChange(0, 18, Formation::TOP);
+        break;
+    case Formation::FRONT:
+        lilShips[0].setChange(18, -2, Formation::TOP);
+        lilShips[1].setChange(18, 10, Formation::TOP);
+        break;
+    case Formation::BOTTOM:
+        lilShips[1].setChange(-7, 30, Formation::TOP);
+        lilShips[0].setChange(-7, 18, Formation::TOP);
+        break;
+    case Formation::TOP:
+        lilShips[1].setChange(-7, -8, Formation::TOP);
+        lilShips[0].setChange(-7, -20, Formation::TOP);
+        break;
+    case Formation::SPIN:
+        lilShips[1].setSpin(0);
+        lilShips[0].setSpin(2);
+    }
 }

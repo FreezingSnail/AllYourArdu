@@ -3,7 +3,55 @@
 #include "lib/paths.hpp"
 #include "sprites/carrierEnemy.h"
 #include "sprites/enemieShips.h"
+#include "sprites/gateEnemy.h"
 #include "sprites/headEnemy.h"
+
+static int16_t getHitPoints(EnemyType type) {
+    switch (type) {
+    case EnemyType::HEAD:
+        return 4;
+    case EnemyType::SPIRAL:
+        return 1;
+    case EnemyType::OVAL:
+        return 1;
+    case EnemyType::SMALLSHIP:
+        return 2;
+    case EnemyType::CARRIER:
+        return 10;
+    case EnemyType::WALL:
+        return 2;
+
+    case EnemyType::BROKEN_WALL_BOTTOM:
+    case EnemyType::BROKEN_WALL_TOP:
+        return -1;
+    }
+}
+
+void Enemy::blink() {
+    switch (type) {
+    case EnemyType::HEAD:
+        Sprites::drawErase(x, y, headEnemy, 0);
+        break;
+
+    case EnemyType::SPIRAL:
+        Sprites::drawErase(x, y, enemieShips, 0 + (3 * frame));
+        break;
+
+    case EnemyType::OVAL:
+        Sprites::drawErase(x, y, enemieShips, 1 + (3 * frame));
+        break;
+
+    case EnemyType::SMALLSHIP:
+        Sprites::drawErase(x, y, enemieShips, 2 + (3 * frame));
+        break;
+
+    case EnemyType::CARRIER:
+        Sprites::drawErase(x, y, carrierEnemy, frame / 2);
+        break;
+    case EnemyType::WALL:
+        Sprites::drawErase(x, y, gateEnemy, 1);
+    }
+}
 
 void Enemy::draw() {
     switch (type) {
@@ -26,6 +74,20 @@ void Enemy::draw() {
 
     case EnemyType::CARRIER:
         Sprites::drawSelfMasked(x, y, carrierEnemy, frame / 2);
+        break;
+
+    case EnemyType::WALL:
+        Sprites::drawSelfMasked(x, y, gateEnemy, 1);
+        Sprites::drawSelfMasked(x, y + 23, gateEnemy, 2);
+        Sprites::drawSelfMasked(x, y - 24, gateEnemy, 0);
+        break;
+
+    case EnemyType::BROKEN_WALL_TOP:
+        Sprites::drawSelfMasked(x, y, gateEnemy, 0);
+        break;
+
+    case EnemyType::BROKEN_WALL_BOTTOM:
+        Sprites::drawSelfMasked(x, y, gateEnemy, 2);
         break;
     }
 }
@@ -69,6 +131,12 @@ void Enemy::tick() {
         }
         applyPath(WAVE_PATH[stepPointer]);
         break;
+    case Pattern::HOLD:
+        if (stepCount > WALL_PATH[stepPointer].stepCount) {
+            stepCount = 0;
+            stepPointer++;
+        }
+        applyPath(WALL_PATH[stepPointer]);
     }
 
     if (x < 0) {
@@ -77,7 +145,7 @@ void Enemy::tick() {
     draw();
 }
 
-void Enemy::spawn(EnemyType type, uint8_t x, uint8_t y) {
+void Enemy::spawn(EnemyType type, int16_t x, int16_t y) {
     this->y = y;
     this->x = x;
     active = true;
@@ -85,6 +153,12 @@ void Enemy::spawn(EnemyType type, uint8_t x, uint8_t y) {
     stepPointer = 0;
     pattern = getPatternByType(type);
     this->type = type;
+    hitCounter = getHitPoints(type);
+}
+void Enemy::spawnBrokenWall(EnemyType type, int16_t x, int16_t y, uint8_t stepCounter, uint8_t stepPointer) {
+    spawn(type, x, y);
+    this->stepCount = stepCounter;
+    this->stepPointer = stepPointer;
 }
 
 void Enemy::despawn() {
@@ -106,6 +180,21 @@ BoundBox Enemy::getBounding() {
 
     case EnemyType::CARRIER:
         return BoundBox(x + 12, y + 10, 24, 20);
+    case EnemyType::WALL:
+        return BoundBox(x, 0, 36, 64);
+    case EnemyType::BROKEN_WALL_BOTTOM:
+        return BoundBox(x, y, 30, 20);
+    case EnemyType::BROKEN_WALL_TOP:
+        return BoundBox(x, 0, 30, 22);
+    }
+}
+
+BoundBox Enemy::getCollision() {
+    switch (type) {
+    case EnemyType::WALL:
+        return BoundBox(x, 0, 63, 128);
+    default:
+        return getBounding();
     }
 }
 
@@ -113,7 +202,17 @@ bool Enemy::hit(BoundBox bulletBox) {
     return getBounding().overlap(bulletBox);
 }
 
+bool Enemy::takeDamage(uint8_t damage) {
+    blink();
+    hitCounter--;
+    if (hitCounter == 0) {
+        reset();
+        return true;
+    }
+    return false;
+}
+
 void Enemy::reset() {
-    x = 160;
+    // x = 160;
     active = false;
 }

@@ -26,6 +26,8 @@ const Level l1 = {
      {&emptySpawn, 0, 250, 250}},
 };
 
+const Level DebugL = {{{&WallEnemy, 3000, 130, 21}, {&emptySpawn, 3000, 250, 250}}};
+
 static const Level *levels[] = {
-    &l1,
+    &DebugL,
 };

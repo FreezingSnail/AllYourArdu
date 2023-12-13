@@ -1,9 +1,18 @@
 #include "src/engine.hpp"
 #include "src/sprites/Title.h"
 #include <Arduboy2.h>
+#include <ArduboyTones.h>
 
 Arduboy2 arduboy;
 Engine engine;
+// ArduboyPlaytune tunes(arduboy.audio.enabled);
+ArduboyTones sound(arduboy.audio.enabled);
+
+const byte score[] PROGMEM = {
+    //
+    0x90, 28,   0,  250, 0x91, 34,   0x80, 0,    250,  0x91, 33,  0,    250,  0x91, 33, 0,   250,  0x91, 36, 0,   250,  0x91, 34, 0,
+    250,  0x91, 33, 0,   250,  0x90, 28,   0x91, 36,   0,    250, 0x90, 28,   0x81, 0,  250, 0x90, 55,   0,  250, 0x90, 54,   0,  250,
+    0x90, 53,   0,  250, 0x90, 52,   0,    250,  0x90, 51,   0,   250,  0x90, 50,   0,  250, 0x90, 49,   0,  250, 0x80, 0xf0};
 
 void setup() {
     arduboy.begin();
@@ -11,6 +20,9 @@ void setup() {
     arduboy.initRandomSeed();
 
     engine.ship.arduboy = &arduboy;
+    //    tunes.initChannel(PIN_SPEAKER_1);
+    // tunes.initChannel(PIN_SPEAKER_2);
+    engine.enemies.sound = &sound;
 }
 
 void dbf loop() {

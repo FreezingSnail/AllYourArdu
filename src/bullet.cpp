@@ -30,6 +30,23 @@ void Bullet::tick() {
     }
 }
 
+void Bullet::move() {
+    switch (type) {
+    case BulletType::DOT:
+        Arduboy2::drawPixel(x, y);
+        break;
+    case BulletType::LINE:
+        Arduboy2::drawLine(x - 5, y, x, y, WHITE);
+        break;
+    case BulletType::CIRCLE:
+        Arduboy2::drawCircle(x, y, 3, WHITE);
+        break;
+    case BulletType::TRIANGLE:
+        Arduboy2::drawTriangle(x + 5, y, x, y - 2, x, y + 2, WHITE);
+        break;
+    }
+}
+
 void Bullet::start(uint8_t x, uint8_t y, uint8_t type) {
     active = true;
     this->x = x;

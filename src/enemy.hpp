@@ -13,15 +13,20 @@ class Enemy {
     EnemyType type;
     uint8_t ticker;
     uint8_t frame;
-    uint8_t stepCount;
+    uint16_t stepCount;
     uint8_t stepPointer;
+    int16_t hitCounter;
 
     void tick();
     void draw();
-    void spawn(EnemyType type, uint8_t x, uint8_t y);
+    void blink();
+    void spawn(EnemyType type, int16_t x, int16_t y);
+    void spawnBrokenWall(EnemyType type, int16_t x, int16_t y, uint8_t stepCounter, uint8_t stepPointer);
     void despawn();
     BoundBox getBounding();
+    BoundBox getCollision();
     bool hit(BoundBox bulletBox);
     void reset();
     void applyPath(Path p);
+    bool takeDamage(uint8_t damage);
 };
