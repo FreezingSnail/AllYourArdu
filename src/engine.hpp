@@ -7,6 +7,7 @@
 class Engine {
   public:
     Bullet playerBullets[BULLETCOUNT];
+    Bullet enemyBullets[BULLETCOUNT];
     Ship ship;
     Enemies enemies;
     GameState state;

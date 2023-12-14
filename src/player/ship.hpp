@@ -13,7 +13,7 @@ class Ship {
     uint8_t x, y;
     int16_t subx, suby;
     uint8_t frame, ticker, lilframe;
-    bool littleShips;
+    bool littleShipsActive;
     uint8_t littleShipIndex;
     Bullet *playerBullets;
     Enemy *enemies;

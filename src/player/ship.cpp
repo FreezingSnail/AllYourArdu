@@ -58,6 +58,11 @@ void Ship::run() {
     draw();
     move();
     littleShip();
+
+    if (Arduboy2::justPressed(LEFT_BUTTON) && Arduboy2::justPressed(RIGHT_BUTTON)) {
+        popPower();
+        return;
+    }
     bulletTick();
 }
 void Ship::draw() {
@@ -118,26 +123,26 @@ void Ship::bulletTick() {
         playerBullets[i].tick();
     }
 
-    if (Arduboy2::justPressed(A_BUTTON) || (Arduboy2::pressed(A_BUTTON) && (ticker % 10 == 0))) {
+    if (Arduboy2::justPressed(A_BUTTON) || (Arduboy2::pressed(A_BUTTON) && (ticker % 15 == 0))) {
         for (uint8_t i = 0; i < BULLETCOUNT; i++) {
             if (!playerBullets[i].active) {
-                playerBullets[i].start(x + 16, y + 8, littleShipIndex);
+                playerBullets[i].start(x + 16, y + 8, littleShipIndex, 1, 0);
                 break;
             }
         }
         if (lilShips[0].active) {
             for (uint8_t i = 0; i < BULLETCOUNT; i++) {
                 if (!playerBullets[i].active) {
-                    playerBullets[i].start(lilShips[0].getX() + 4, lilShips[0].getY() + 4, littleShipIndex);
+                    playerBullets[i].start(lilShips[0].getX() + 4, lilShips[0].getY() + 4, littleShipIndex, 1, -1);
                     break;
                 }
             }
-            if (lilShips[1].active) {
-                for (uint8_t i = 0; i < BULLETCOUNT; i++) {
-                    if (!playerBullets[i].active) {
-                        playerBullets[i].start(lilShips[1].getX() + 4, lilShips[1].getY() + 4, littleShipIndex);
-                        break;
-                    }
+        }
+        if (lilShips[1].active) {
+            for (uint8_t i = 0; i < BULLETCOUNT; i++) {
+                if (!playerBullets[i].active) {
+                    playerBullets[i].start(lilShips[1].getX() + 4, lilShips[1].getY() + 4, littleShipIndex, 1, 1);
+                    break;
                 }
             }
         }
@@ -154,7 +159,7 @@ void Ship::spawnBulletShip(ShipType type) {
     lilShips[1].active = true;
     lilShips[1].type = type;
     littleShipIndex = uint8_t(type);
-    littleShips = true;
+    littleShipsActive = true;
 }
 
 void Ship::pushPower(ShipType type) {
@@ -165,10 +170,18 @@ void Ship::pushPower(ShipType type) {
     powerups[powerupPointer] = type;
 }
 void Ship::popPower() {
+    ShipType type = powerups[0];
     for (int8_t i = 0; i < powerupPointer; i++) {
         powerups[i] = powerups[i + 1];
     }
     powerupPointer--;
+    lilShips[0].despawn();
+    lilShips[1].despawn();
+    if (powerupPointer >= 0) {
+        spawnBulletShip(type);
+    } else {
+        littleShipsActive = false;
+    }
 }
 
 void Ship::formChange() {
