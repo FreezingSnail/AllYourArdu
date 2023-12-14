@@ -1,11 +1,6 @@
 #pragma once
 
-enum class Pattern {
-    STRAIGHT,
-    DOUBLEBACK,
-    WAVE,
-    HOLD,
-};
+enum class Pattern { STRAIGHT, DOUBLEBACK, WAVE, HOLD, BOSS };
 
 enum class EnemyType {
     HEAD,
@@ -16,6 +11,11 @@ enum class EnemyType {
     WALL,
     BROKEN_WALL_TOP,
     BROKEN_WALL_BOTTOM,
+
+    BOSSCORE,
+    BOSS_TOP_WING,
+    BOSS_BOTTOM_WING,
+    BOSS_CORE,
 
     NONE,
 };
@@ -30,6 +30,10 @@ enum Formation {
     NONE,
 };
 
+enum BossType {
+    L1,
+};
+
 static Pattern getPatternByType(EnemyType type) {
     switch (type) {
     case EnemyType::HEAD:
@@ -42,10 +46,12 @@ static Pattern getPatternByType(EnemyType type) {
         return Pattern::WAVE;
     case EnemyType::CARRIER:
     case EnemyType::WALL:
+        return Pattern::HOLD;
     case EnemyType::BROKEN_WALL_BOTTOM:
     case EnemyType::BROKEN_WALL_TOP:
-        return Pattern::HOLD;
+        return Pattern::STRAIGHT;
     }
+    return Pattern::BOSS;
 }
 
 static bool hitable(EnemyType type) {

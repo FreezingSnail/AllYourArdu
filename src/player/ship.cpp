@@ -66,7 +66,7 @@ void Ship::run() {
     bulletTick();
 }
 void Ship::draw() {
-    Sprites::drawSelfMasked(x, y, mainship, frame);
+    Sprites::drawOverwrite(x, y, mainship, frame);
     arduboy->setCursor(20, 0);
     arduboy->print(F("P:"));
     for (uint8_t i = 0; i <= powerupPointer; i++) {

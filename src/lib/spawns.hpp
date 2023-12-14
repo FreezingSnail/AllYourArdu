@@ -19,3 +19,5 @@ const Spawns SmallShips PROGMEM = {EnemyType::SMALLSHIP, 6, 15};
 const Spawns Carrier PROGMEM = {EnemyType::CARRIER, 1, 1};
 
 const Spawns WallEnemy PROGMEM = {EnemyType::WALL, 1, 1};
+
+const Spawns Boss PROGMEM = {EnemyType::BOSS_CORE, 1, 1};

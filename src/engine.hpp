@@ -3,6 +3,7 @@
 #include "globals.hpp"
 #include "lib/levels.hpp"
 #include "player/ship.hpp"
+#include "boss.hpp"
 
 class Engine {
   public:
@@ -16,6 +17,9 @@ class Engine {
     uint8_t currentLevelIndex;
     uint8_t currentSpawnIndex;
     uint8_t spawnCounter;
+    uint8_t debug;
+
+    BossEnemy boss;
 
     Engine();
     void run();
@@ -23,4 +27,5 @@ class Engine {
     void loadLevel(uint8_t level);
     void spawn();
     void bulletTick();
+    bool clearedEnemies();
 };

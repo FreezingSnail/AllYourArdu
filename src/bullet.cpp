@@ -2,6 +2,7 @@
 #include "globals.hpp"
 
 void Bullet::draw() {
+    getBounding().draw();
     switch (type) {
     case BulletType::DOT:
         Arduboy2::drawPixel(x, y);
@@ -99,7 +100,7 @@ BoundBox Bullet::getBounding() {
     case BulletType::LINE:
         return BoundBox(x - 5, y, 5, 0);
     case BulletType::CIRCLE:
-        return BoundBox(x + 1, y + 1, 2, 2);
+        return BoundBox(x - 2, y - 2, 5, 5);
     case BulletType::TRIANGLE:
         return BoundBox(x - 1, y - 2, 2, 2);
     }

@@ -28,7 +28,8 @@ void LilShip::tick(Enemy *enemies) {
 }
 
 void LilShip::draw() {
-    Sprites::drawSelfMasked(x, y, miniShips, (4 * (frame)) + uint8_t(type));
+    getBound().draw();
+    Sprites::drawOverwrite(x, y, miniShips, (4 * (frame)) + uint8_t(type));
 }
 
 void LilShip::spawn(uint8_t *xRoot, uint8_t *yRoot, int8_t xMod, int8_t yMod) {
@@ -38,12 +39,12 @@ void LilShip::spawn(uint8_t *xRoot, uint8_t *yRoot, int8_t xMod, int8_t yMod) {
     this->yMod = yMod;
 }
 
-void LilShip::despawn() {
+void dbf LilShip::despawn() {
     this->active = false;
 }
 
 BoundBox LilShip::getBound() {
-    return BoundBox(x + 1, y + 1, 5, 1);
+    return BoundBox(x + 1, y + 1, 5, 3);
 }
 
 void LilShip::setChange(int8_t xMod, int8_t yMod, Formation formation) {
