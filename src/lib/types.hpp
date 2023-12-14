@@ -41,7 +41,6 @@ static Pattern getPatternByType(EnemyType type) {
     case EnemyType::SMALLSHIP:
         return Pattern::WAVE;
     case EnemyType::CARRIER:
-        return Pattern::STRAIGHT;
     case EnemyType::WALL:
     case EnemyType::BROKEN_WALL_BOTTOM:
     case EnemyType::BROKEN_WALL_TOP:

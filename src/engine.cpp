@@ -26,13 +26,15 @@ void Engine::run() {
     spawn();
     ship.run();
     enemies.tick();
+    bulletTick();
 
     for (uint8_t i = 0; i < ENEMIES; i++) {
-        enemies.enemies[i].tick();
-
         if (!enemies.enemies[i].active) {
             continue;
         }
+
+        enemies.enemies[i].tick(enemyBullets);
+
         if (ship.getBound().overlap(enemies.enemies[i].getCollision())) {
             //*state = GameState::LOSE;
         }
@@ -48,7 +50,7 @@ void Engine::run() {
         for (uint8_t j = 0; j < BULLETCOUNT; j++) {
             if (playerBullets[j].active) {
                 if (enemies.enemies[i].hit(playerBullets[j].getBounding())) {
-                    if (enemies.enemies[i].takeDamage(0)) {
+                    if (enemies.enemies[i].takeDamage(playerBullets[j].getDamage())) {
                         enemies.sound->tone(NOTE_E3, 40);
                         enemies.score++;
                         if (enemies.enemies[i].type == EnemyType::WALL) {
@@ -96,5 +98,11 @@ void dbf Engine::spawn() {
         enemies.spawn(currentLevel->waves[currentSpawnIndex].spawnInstructions->type, currentLevel->waves[currentSpawnIndex].x,
                       currentLevel->waves[currentSpawnIndex].y);
         spawnCounter++;
+    }
+}
+
+void Engine::bulletTick() {
+    for (uint8_t i = 0; i < BULLETCOUNT; i++) {
+        enemyBullets[i].tick();
     }
 }

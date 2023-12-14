@@ -19,12 +19,21 @@ static int16_t getHitPoints(EnemyType type) {
     case EnemyType::CARRIER:
         return 10;
     case EnemyType::WALL:
-        return 2;
+        return 50;
 
     case EnemyType::BROKEN_WALL_BOTTOM:
     case EnemyType::BROKEN_WALL_TOP:
         return -1;
     }
+}
+
+bool Enemy::shoot() {
+    switch (type) {
+    case EnemyType::HEAD:
+    case EnemyType::CARRIER:
+        return true;
+    }
+    return false;
 }
 
 void Enemy::blink() {
@@ -97,7 +106,7 @@ void Enemy::applyPath(Path p) {
     y -= p.yMod;
 }
 
-void Enemy::tick() {
+void Enemy::tick(Bullet *enemyBullets) {
     if (!active) {
         return;
     }
@@ -111,6 +120,9 @@ void Enemy::tick() {
         }
     }
 
+    if (shoot()) {
+        bullet(enemyBullets);
+    }
     switch (pattern) {
     case Pattern::STRAIGHT:
         applyPath(STRAIGHT_PATH[0]);
@@ -204,7 +216,7 @@ bool Enemy::hit(BoundBox bulletBox) {
 
 bool Enemy::takeDamage(uint8_t damage) {
     blink();
-    hitCounter--;
+    hitCounter -= damage;
     if (hitCounter == 0) {
         reset();
         return true;
@@ -215,4 +227,29 @@ bool Enemy::takeDamage(uint8_t damage) {
 void Enemy::reset() {
     // x = 160;
     active = false;
+}
+
+void Enemy::bullet(Bullet *enemyBullets) {
+    uint8_t x, y, t, tickerMod;
+    switch (type) {
+    case EnemyType::CARRIER:
+        x = x + 4;
+        y = y + 15;
+        t = 2;
+        tickerMod = 40;
+    default:
+        x = x;
+        y = y;
+        t = 1;
+        tickerMod = 20;
+    }
+
+    if (ticker % tickerMod == 0) {
+        for (uint8_t i = 0; i < BULLETCOUNT; i++) {
+            if (!enemyBullets[i].active) {
+                enemyBullets[i].start(x, y, 2, 1, 0, true);
+                return;
+            }
+        }
+    }
 }

@@ -1,4 +1,5 @@
 #pragma once
+#include "bullet.hpp"
 #include "lib/boundBox.hpp"
 #include "lib/paths.hpp"
 #include "lib/types.hpp"
@@ -17,7 +18,7 @@ class Enemy {
     uint8_t stepPointer;
     int16_t hitCounter;
 
-    void tick();
+    void tick(Bullet *enemyBullets);
     void draw();
     void blink();
     void spawn(EnemyType type, int16_t x, int16_t y);
@@ -29,4 +30,6 @@ class Enemy {
     void reset();
     void applyPath(Path p);
     bool takeDamage(uint8_t damage);
+    bool shoot();
+    void bullet(Bullet *enemyBullets);
 };

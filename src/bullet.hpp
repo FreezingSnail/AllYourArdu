@@ -28,4 +28,5 @@ class Bullet {
     BoundBox getBounding();
     void move();
     void applyPath(Path p);
+    uint8_t getDamage();
 };

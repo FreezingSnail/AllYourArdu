@@ -75,6 +75,7 @@ void Bullet::start(uint8_t x, uint8_t y, uint8_t type, int8_t xMod, int8_t yMod)
     active = true;
     this->x = x;
     this->y = y;
+    this->enemy = false;
     this->type = BulletType(type);
     if (this->type == BulletType::TRIANGLE || this->type == BulletType::CIRCLE) {
         this->xMod = xMod;
@@ -111,4 +112,17 @@ void Bullet::reset() {
     stepPointer = 0;
     this->xMod = 1;
     this->yMod = 1;
+}
+
+uint8_t Bullet::getDamage() {
+    switch (type) {
+    case BulletType::DOT:
+        return 1;
+    case BulletType::LINE:
+        return 2;
+    case BulletType::CIRCLE:
+        return 3;
+    case BulletType::TRIANGLE:
+        return 4;
+    }
 }

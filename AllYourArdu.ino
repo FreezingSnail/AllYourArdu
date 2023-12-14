@@ -1,3 +1,4 @@
+#include "src/background.hpp"
 #include "src/engine.hpp"
 #include "src/sprites/Title.h"
 #include <Arduboy2.h>
@@ -5,6 +6,7 @@
 
 Arduboy2 arduboy;
 Engine engine;
+Background background;
 // ArduboyPlaytune tunes(arduboy.audio.enabled);
 ArduboyTones sound(arduboy.audio.enabled);
 
@@ -23,14 +25,16 @@ void setup() {
     //    tunes.initChannel(PIN_SPEAKER_1);
     // tunes.initChannel(PIN_SPEAKER_2);
     engine.enemies.sound = &sound;
+    background.init();
 }
 
-void dbf loop() {
+void loop() {
     if (!arduboy.nextFrame()) {
         return;
     }
     arduboy.clear();
     arduboy.pollButtons();
+    background.tick();
 
     switch (engine.state) {
     case GameState::TITLE:

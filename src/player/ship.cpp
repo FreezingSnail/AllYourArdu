@@ -181,6 +181,7 @@ void Ship::popPower() {
         spawnBulletShip(type);
     } else {
         littleShipsActive = false;
+        littleShipIndex = 0;
     }
 }
 

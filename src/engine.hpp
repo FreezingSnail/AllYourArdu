@@ -23,4 +23,5 @@ class Engine {
     void restart();
     void loadLevel(uint8_t level);
     void spawn();
+    void bulletTick();
 };
