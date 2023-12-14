@@ -9,21 +9,36 @@
 static int16_t getHitPoints(EnemyType type) {
     switch (type) {
     case EnemyType::HEAD:
-        return 4;
+        return 15;
     case EnemyType::SPIRAL:
-        return 1;
+        return 5;
     case EnemyType::OVAL:
         return 1;
     case EnemyType::SMALLSHIP:
-        return 2;
-    case EnemyType::CARRIER:
         return 10;
+    case EnemyType::CARRIER:
+        return 40;
     case EnemyType::WALL:
-        return 50;
+        return 200;
 
     case EnemyType::BROKEN_WALL_BOTTOM:
     case EnemyType::BROKEN_WALL_TOP:
         return -1;
+    }
+}
+
+static int16_t getSubMod(EnemyType type) {
+    switch (type) {
+    case EnemyType::HEAD:
+    case EnemyType::SPIRAL:
+    case EnemyType::OVAL:
+    case EnemyType::SMALLSHIP:
+        return 1;
+    case EnemyType::CARRIER:
+    case EnemyType::WALL:
+    case EnemyType::BROKEN_WALL_BOTTOM:
+    case EnemyType::BROKEN_WALL_TOP:
+        return 4;
     }
 }
 
@@ -63,38 +78,31 @@ void Enemy::blink() {
 }
 
 void Enemy::draw() {
+    // getBounding().draw();
     switch (type) {
     case EnemyType::HEAD:
         Sprites::drawSelfMasked(x, y, headEnemy, 0);
-        // getBounding().draw();
         break;
-
     case EnemyType::SPIRAL:
         Sprites::drawSelfMasked(x, y, enemieShips, 0 + (3 * frame));
         break;
-
     case EnemyType::OVAL:
         Sprites::drawSelfMasked(x, y, enemieShips, 1 + (3 * frame));
         break;
-
     case EnemyType::SMALLSHIP:
         Sprites::drawSelfMasked(x, y, enemieShips, 2 + (3 * frame));
         break;
-
     case EnemyType::CARRIER:
         Sprites::drawSelfMasked(x, y, carrierEnemy, frame / 2);
         break;
-
     case EnemyType::WALL:
         Sprites::drawSelfMasked(x, y, gateEnemy, 1);
         Sprites::drawSelfMasked(x, y + 23, gateEnemy, 2);
         Sprites::drawSelfMasked(x, y - 24, gateEnemy, 0);
         break;
-
     case EnemyType::BROKEN_WALL_TOP:
         Sprites::drawSelfMasked(x, y, gateEnemy, 0);
         break;
-
     case EnemyType::BROKEN_WALL_BOTTOM:
         Sprites::drawSelfMasked(x, y, gateEnemy, 2);
         break;
@@ -102,8 +110,28 @@ void Enemy::draw() {
 }
 
 void Enemy::applyPath(Path p) {
-    x -= p.xMod;
-    y -= p.yMod;
+
+    subx -= p.xMod;
+    suby -= p.yMod;
+
+    if (suby < 0) {
+        suby = 0;
+    }
+    if (subx < 0) {
+        subx = 0;
+    }
+    if (subx >= ((128 * SUBPIXELMOD) - (16 * SUBPIXELMOD))) {
+        subx = ((128 * SUBPIXELMOD) - (16 * SUBPIXELMOD));
+    }
+    if (suby >= ((64 * SUBPIXELMOD) - (16 * SUBPIXELMOD))) {
+        suby = ((64 * SUBPIXELMOD) - (16 * SUBPIXELMOD));
+    }
+
+    x = subx / SUBPIXELMOD;
+    y = suby / SUBPIXELMOD;
+    if (subx % SUBPIXELMOD == 0) {
+        stepCount++;
+    }
 }
 
 void Enemy::tick(Bullet *enemyBullets) {
@@ -112,7 +140,6 @@ void Enemy::tick(Bullet *enemyBullets) {
     }
 
     ticker++;
-    stepCount++;
     if (ticker % 15 == 0) {
         frame++;
         if (frame > 3) {
@@ -166,6 +193,9 @@ void Enemy::spawn(EnemyType type, int16_t x, int16_t y) {
     pattern = getPatternByType(type);
     this->type = type;
     hitCounter = getHitPoints(type);
+    SUBPIXELMOD = getSubMod(type);
+    subx = x * SUBPIXELMOD;
+    suby = y * SUBPIXELMOD;
 }
 void Enemy::spawnBrokenWall(EnemyType type, int16_t x, int16_t y, uint8_t stepCounter, uint8_t stepPointer) {
     spawn(type, x, y);
@@ -183,15 +213,12 @@ BoundBox Enemy::getBounding() {
         return BoundBox(x + 4, y, 12, 16);
     case EnemyType::SPIRAL:
         return BoundBox(x, y, 8, 8);
-
     case EnemyType::OVAL:
         return BoundBox(x + 1, y, 6, 8);
-
     case EnemyType::SMALLSHIP:
         return BoundBox(x + 2, y, 4, 8);
-
     case EnemyType::CARRIER:
-        return BoundBox(x + 12, y + 10, 24, 20);
+        return BoundBox(x + 12, y + 10, 18, 20);
     case EnemyType::WALL:
         return BoundBox(x, 0, 36, 64);
     case EnemyType::BROKEN_WALL_BOTTOM:
@@ -230,16 +257,17 @@ void Enemy::reset() {
 }
 
 void Enemy::bullet(Bullet *enemyBullets) {
-    uint8_t x, y, t, tickerMod;
-    switch (type) {
+    uint8_t xS, yS, t, tickerMod;
+    switch (this->type) {
     case EnemyType::CARRIER:
-        x = x + 4;
-        y = y + 15;
+        xS = this->x + 10;
+        yS = this->y + 25;
         t = 2;
         tickerMod = 40;
+        break;
     default:
-        x = x;
-        y = y;
+        xS = this->x;
+        yS = this->y;
         t = 1;
         tickerMod = 20;
     }
@@ -247,7 +275,7 @@ void Enemy::bullet(Bullet *enemyBullets) {
     if (ticker % tickerMod == 0) {
         for (uint8_t i = 0; i < BULLETCOUNT; i++) {
             if (!enemyBullets[i].active) {
-                enemyBullets[i].start(x, y, 2, 1, 0, true);
+                enemyBullets[i].start(xS, yS, 2, 1, 0, true);
                 return;
             }
         }

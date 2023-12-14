@@ -21,7 +21,7 @@ class Background {
             ticker = 0;
         }
 
-        if (ticker % 30 == 0) {
+        if (ticker % 40 == 0) {
             for (uint8_t i = 0; i < 5; i++) {
                 x[i]--;
                 if (x[i] < -5) {

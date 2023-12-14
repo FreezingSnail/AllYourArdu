@@ -90,7 +90,7 @@ void Engine::loadLevel(uint8_t level) {
     currentSpawnIndex = 0;
 }
 
-void dbf Engine::spawn() {
+void Engine::spawn() {
     uint16_t wait = currentLevel->waves[currentSpawnIndex].spawnInstructions->tickInterval;
     uint8_t total = currentLevel->waves[currentSpawnIndex].spawnInstructions->count;
     if (ticker % wait == 0 && spawnCounter < total) {

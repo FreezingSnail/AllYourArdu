@@ -26,7 +26,7 @@ const Level l1 = {
      {&emptySpawn, 0, 250, 250}},
 };
 
-const Level DebugL = {{{&Carrier, 3000, 128, 30},
+const Level DebugL = {{{&Carrier, 3000, 128, 15},
                        {&emptySpawn, 0, 250, 250},
                        {&emptySpawn, 0, 250, 250},
                        {&emptySpawn, 0, 250, 250},

@@ -9,6 +9,9 @@
 class Enemy {
   public:
     int16_t x, y;
+    int16_t subx, suby;
+    uint8_t SUBPIXELMOD;
+
     Pattern pattern;
     bool active;
     EnemyType type;
