@@ -3,7 +3,6 @@
 #include "enemy.hpp"
 #include "globals.hpp"
 #include "powerup.hpp"
-#include <ArduboyTones.h>
 
 class Enemies {
   public:
@@ -14,7 +13,6 @@ class Enemies {
     uint8_t powerupTimer;
     PowerUp powerups;
     bool activePowerUp;
-    ArduboyTones *sound;
 
     Enemies();
     void tick();

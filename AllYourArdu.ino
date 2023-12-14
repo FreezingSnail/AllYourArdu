@@ -1,20 +1,20 @@
+#include <Arduboy2.h>
+#include <ArduboyPlaytune.h>
+// #include <ArduboyTones.h>
 #include "src/background.hpp"
 #include "src/engine.hpp"
 #include "src/sprites/Title.h"
-#include <Arduboy2.h>
-#include <ArduboyTones.h>
+#include "src/tones/squareztest.h"
 
 Arduboy2 arduboy;
 Engine engine;
 Background background;
-// ArduboyPlaytune tunes(arduboy.audio.enabled);
-ArduboyTones sound(arduboy.audio.enabled);
+// ArduboyTones sound(arduboy.audio.enabled);
 
-const byte score[] PROGMEM = {
-    //
-    0x90, 28,   0,  250, 0x91, 34,   0x80, 0,    250,  0x91, 33,  0,    250,  0x91, 33, 0,   250,  0x91, 36, 0,   250,  0x91, 34, 0,
-    250,  0x91, 33, 0,   250,  0x90, 28,   0x91, 36,   0,    250, 0x90, 28,   0x81, 0,  250, 0x90, 55,   0,  250, 0x90, 54,   0,  250,
-    0x90, 53,   0,  250, 0x90, 52,   0,    250,  0x90, 51,   0,   250,  0x90, 50,   0,  250, 0x90, 49,   0,  250, 0x80, 0xf0};
+ArduboyPlaytune tunes(arduboy.audio.enabled);
+
+// Playtune bytestream for file "midi/squareztest.mid" created by MIDI2TONES V1.0.0 on Thu Dec 14 00:32:38 2023
+// command line: midi2tones -o1 midi/squareztest
 
 void setup() {
     arduboy.begin();
@@ -22,9 +22,9 @@ void setup() {
     arduboy.initRandomSeed();
 
     engine.ship.arduboy = &arduboy;
-    //    tunes.initChannel(PIN_SPEAKER_1);
-    // tunes.initChannel(PIN_SPEAKER_2);
-    engine.enemies.sound = &sound;
+    tunes.initChannel(PIN_SPEAKER_1);
+    tunes.initChannel(PIN_SPEAKER_2);
+    //  engine.enemies.sound = &sound;
     background.init();
 }
 
@@ -32,6 +32,7 @@ void loop() {
     if (!arduboy.nextFrame()) {
         return;
     }
+
     arduboy.clear();
     arduboy.pollButtons();
     background.tick();
@@ -42,11 +43,18 @@ void loop() {
         if (Arduboy2::justPressed(A_BUTTON)) {
             engine.state = GameState::GAME;
             engine.ship.init();
+            arduboy.audio.on();
+            if (!tunes.playing()) {
+                tunes.playScore(score);
+            }
             return;
         }
         break;
 
     case GameState::GAME:
+        if (!tunes.playing()) {
+            tunes.playScore(score);
+        }
         Arduboy2::setCursor(0, 0);
         arduboy.println(engine.enemies.score);
         engine.run();

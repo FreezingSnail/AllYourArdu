@@ -51,7 +51,7 @@ void Engine::run() {
             if (playerBullets[j].active) {
                 if (enemies.enemies[i].hit(playerBullets[j].getBounding())) {
                     if (enemies.enemies[i].takeDamage(playerBullets[j].getDamage())) {
-                        enemies.sound->tone(NOTE_E3, 40);
+                        // enemies.sound->tone(NOTE_E3, 40);
                         enemies.score++;
                         if (enemies.enemies[i].type == EnemyType::WALL) {
                             // spawnBrokenWall(EnemyType::BROKEN_WALL_TOP, enemies[i].x, enemies[i].y, enemies[i].stepPointer,
