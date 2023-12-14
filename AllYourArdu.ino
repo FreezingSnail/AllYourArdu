@@ -45,7 +45,7 @@ void loop() {
             engine.ship.init();
             arduboy.audio.on();
             if (!tunes.playing()) {
-                tunes.playScore(score);
+                // tunes.playScore(score);
             }
             return;
         }
@@ -53,7 +53,7 @@ void loop() {
 
     case GameState::GAME:
         if (!tunes.playing()) {
-            tunes.playScore(score);
+            // tunes.playScore(score);
         }
         Arduboy2::setCursor(0, 0);
         arduboy.println(engine.enemies.score);

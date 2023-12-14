@@ -16,7 +16,6 @@ class Engine {
     uint8_t currentLevelIndex;
     uint8_t currentSpawnIndex;
     uint8_t spawnCounter;
-    EnemyType debug;
 
     Engine();
     void run();

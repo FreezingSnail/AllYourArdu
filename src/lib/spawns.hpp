@@ -8,14 +8,14 @@ struct Spawns {
     uint8_t tickInterval;
 };
 
-const Spawns emptySpawn{EnemyType::NONE, 0, 0};
+const Spawns emptySpawn PROGMEM = {EnemyType::NONE, 0, 0};
 
-const Spawns lineSpiral = {EnemyType::SPIRAL, 15, 15};
+const Spawns lineSpiral PROGMEM = {EnemyType::SPIRAL, 15, 15};
 
-const Spawns Ovals = {EnemyType::OVAL, 6, 15};
+const Spawns Ovals PROGMEM = {EnemyType::OVAL, 6, 15};
 
-const Spawns SmallShips = {EnemyType::SMALLSHIP, 6, 15};
+const Spawns SmallShips PROGMEM = {EnemyType::SMALLSHIP, 6, 15};
 
-const Spawns Carrier = {EnemyType::CARRIER, 1, 1};
+const Spawns Carrier PROGMEM = {EnemyType::CARRIER, 1, 1};
 
-const Spawns WallEnemy = {EnemyType::WALL, 1, 1};
+const Spawns WallEnemy PROGMEM = {EnemyType::WALL, 1, 1};

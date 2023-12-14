@@ -12,12 +12,12 @@ Engine::Engine() {
 
 void Engine::run() {
     ticker++;
-    debug = currentLevel->waves[currentSpawnIndex].spawnInstructions->type;
-    if (ticker == currentLevel->waves[currentSpawnIndex].waitTicks) {
+    if (ticker == pgm_read_byte(&(currentLevel->waves[currentSpawnIndex]).waitTicks)) {
         ticker = 0;
         currentSpawnIndex++;
         spawnCounter = 0;
-        if (currentLevel->waves[currentSpawnIndex].spawnInstructions->type == EnemyType::NONE) {
+        if (EnemyType(pgm_read_byte(&pgm_read_pointer(&currentLevel->waves[currentSpawnIndex].spawnInstructions)->type)) ==
+            EnemyType::NONE) {
             currentLevelIndex++;
             loadLevel(currentLevelIndex);
             return;
@@ -85,18 +85,18 @@ void Engine::restart() {
 }
 
 void Engine::loadLevel(uint8_t level) {
-    currentLevel = levels[level];
+    currentLevel = pgm_read_pointer(&levels[level]);
     ticker = 0;
     currentSpawnIndex = 0;
 }
 
 void Engine::spawn() {
-    uint16_t wait = currentLevel->waves[currentSpawnIndex].spawnInstructions->tickInterval;
-    uint8_t total = currentLevel->waves[currentSpawnIndex].spawnInstructions->count;
+    uint16_t wait = pgm_read_byte(&pgm_read_pointer(&currentLevel->waves[currentSpawnIndex].spawnInstructions)->tickInterval);
+    uint8_t total = pgm_read_byte(&pgm_read_pointer(&currentLevel->waves[currentSpawnIndex].spawnInstructions)->count);
     if (ticker % wait == 0 && spawnCounter < total) {
 
-        enemies.spawn(currentLevel->waves[currentSpawnIndex].spawnInstructions->type, currentLevel->waves[currentSpawnIndex].x,
-                      currentLevel->waves[currentSpawnIndex].y);
+        enemies.spawn(EnemyType(pgm_read_byte(&pgm_read_pointer(&currentLevel->waves[currentSpawnIndex].spawnInstructions)->type)),
+                      pgm_read_byte(&currentLevel->waves[currentSpawnIndex].x), pgm_read_byte(&currentLevel->waves[currentSpawnIndex].y));
         spawnCounter++;
     }
 }
