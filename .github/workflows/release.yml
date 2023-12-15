@@ -57,8 +57,9 @@ jobs:
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v4
-        with:
-          path: build/
+        
+      - name: check
+        run: ls -R
 
       - name: Upload artifacts to GitHub Releases
         env:
