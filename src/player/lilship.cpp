@@ -28,7 +28,7 @@ void LilShip::tick(Enemy *enemies) {
 }
 
 void LilShip::draw() {
-    getBound().draw();
+    // getBound().draw();
     Sprites::drawOverwrite(x, y, miniShips, (4 * (frame)) + uint8_t(type));
 }
 

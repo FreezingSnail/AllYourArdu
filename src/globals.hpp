@@ -4,7 +4,7 @@
 #define dbf __attribute__((optimize("-O0")))
 
 #define BULLETCOUNT 9
-#define ENEMIES 20
+#define ENEMIES 10
 
 enum class ShipType {
     MINI,

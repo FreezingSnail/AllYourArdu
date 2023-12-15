@@ -1,6 +1,6 @@
 #pragma once
-#include "spawns.hpp"
 #include "Arduboy2.h"
+#include "spawns.hpp"
 
 #define MAX_WAVES 10
 
@@ -37,8 +37,8 @@ const Level DebugL PROGMEM = {{{&Boss, 3000, 128, 15},   //{&WallEnemy, 1000, 13
                                {&emptySpawn, 0, 250, 250}}};
 
 const Level *const levels[] PROGMEM = {
-    &DebugL,
-    //&l1,
+    //&DebugL,
+    &l1,
 };
 
 template <typename T> T *pgm_read_pointer(T *const *pointer) {

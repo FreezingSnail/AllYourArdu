@@ -24,3 +24,6 @@ const uint8_t TRI_STEPS = 2;
 const Path TRI_PATH[] = {{4, 2, 0}, {1, 2, 1}};
 
 const Path BOSS_PATH[] = {{30, 1, 0}, {10000, 0, 0}, {120, 1, 0}};
+
+const uint8_t UP_DOWN_STEPS = 5;
+const Path UP_DOWN[] = {{30, 1, 0}, {20, 0, 1}, {20, 0, 0}, {20, 0, -11}, {20, 0, 0}};

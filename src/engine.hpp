@@ -1,14 +1,16 @@
 #pragma once
+#include "boss.hpp"
 #include "enemies.hpp"
+#include "explosion.hpp"
 #include "globals.hpp"
 #include "lib/levels.hpp"
 #include "player/ship.hpp"
-#include "boss.hpp"
 
 class Engine {
   public:
     Bullet playerBullets[BULLETCOUNT];
     Bullet enemyBullets[BULLETCOUNT];
+    Explosion explosions[8];
     Ship ship;
     Enemies enemies;
     GameState state;
@@ -17,7 +19,6 @@ class Engine {
     uint8_t currentLevelIndex;
     uint8_t currentSpawnIndex;
     uint8_t spawnCounter;
-    uint8_t debug;
 
     BossEnemy boss;
 
@@ -28,4 +29,6 @@ class Engine {
     void spawn();
     void bulletTick();
     bool clearedEnemies();
+
+    void spawnExplode(uint8_t x, uint8_t y, uint8_t size);
 };

@@ -1,14 +1,15 @@
 #include "boss.hpp"
-#include "lib/bossdata.hpp"
 #include "globals.hpp"
+#include "lib/bossdata.hpp"
+#include <Arduboy2.h>
 
 void BossEnemy::load(BossData *const data) {
     x = 128;
     y = 24;
-    coreSprite = data->core;
-    bodySheet = data->sheet;
-    type = data->type;
-    vertical = data->vertical;
+    coreSprite = pgm_read_ptr(&data->core);
+    bodySheet = pgm_read_ptr(&data->sheet);
+    type = static_cast<BossType>(pgm_read_byte(&data->type));
+    vertical = pgm_read_byte(&data->vertical);
     active = true;
     switch (type) {
     case BossType::L1:

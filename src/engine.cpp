@@ -9,7 +9,7 @@ Engine::Engine() {
     ship.state = &state;
     ship.powerup = &enemies.powerups;
     loadLevel(0);
-    boss.load(&boss1Data);
+    // boss.load(&boss1Data);
 }
 
 void Engine::run() {
@@ -35,6 +35,9 @@ void Engine::run() {
     enemies.tick();
     bulletTick();
     boss.tick(enemyBullets);
+    for (uint8_t i = 0; i < 8; i++) {
+        explosions[i].tick();
+    }
 
     for (uint8_t i = 0; i < ENEMIES; i++) {
         if (!enemies.enemies[i].active) {
@@ -60,6 +63,8 @@ void Engine::run() {
         for (uint8_t j = 0; j < BULLETCOUNT; j++) {
             if (playerBullets[j].active) {
                 if (enemies.enemies[i].hit(playerBullets[j].getBounding())) {
+                    spawnExplode(playerBullets[j].x - 4, playerBullets[j].y - 4, 0);
+
                     if (enemies.enemies[i].takeDamage(playerBullets[j].getDamage())) {
                         // enemies.sound->tone(NOTE_E3, 40);
                         enemies.score++;
@@ -85,7 +90,9 @@ void Engine::run() {
             int8_t hit = boss.hit(playerBullets[j].getBounding());
             if (hit >= 0) {
                 boss.enemies[hit].takeDamage(playerBullets[j].getDamage());
+                spawnExplode(playerBullets[j].x - 4, playerBullets[j].y - 4, 8);
                 playerBullets[j].reset();
+
                 break;
             }
         }
@@ -134,7 +141,6 @@ void Engine::spawn() {
     uint16_t wait = pgm_read_byte(&pgm_read_pointer(&currentLevel->waves[currentSpawnIndex].spawnInstructions)->tickInterval);
     uint8_t total = pgm_read_byte(&pgm_read_pointer(&currentLevel->waves[currentSpawnIndex].spawnInstructions)->count);
     if (ticker % wait == 0 && spawnCounter < total) {
-        debug = total;
 
         enemies.spawn(EnemyType(pgm_read_byte(&pgm_read_pointer(&currentLevel->waves[currentSpawnIndex].spawnInstructions)->type)),
                       pgm_read_byte(&currentLevel->waves[currentSpawnIndex].x), pgm_read_byte(&currentLevel->waves[currentSpawnIndex].y));
@@ -152,9 +158,11 @@ void Engine::bulletTick() {
         } else if (ship.lilShips[0].active && enemyBullets[i].getBounding().overlap(ship.lilShips[0].getBound())) {
             ship.lilShips[0].despawn();
             enemyBullets[i].reset();
-        } else if (ship.lilShips[0].active && enemyBullets[i].getBounding().overlap(ship.lilShips[1].getBound())) {
+            // spawnExplode(enemyBullets[i].x - 4, enemyBullets[i].y - 4, 8);
+        } else if (ship.lilShips[1].active && enemyBullets[i].getBounding().overlap(ship.lilShips[1].getBound())) {
             ship.lilShips[1].despawn();
             enemyBullets[i].reset();
+            // spawnExplode(enemyBullets[i].x - 4, enemyBullets[i].y - 4, 8);
         }
     }
 }
@@ -167,4 +175,20 @@ bool Engine::clearedEnemies() {
     }
 
     return true;
+}
+
+void Engine::spawnExplode(uint8_t x, uint8_t y, uint8_t size) {
+    uint8_t spawn = rand() % 100;
+    if (spawn < 75) {
+        return;
+    }
+    for (uint8_t i = 0; i < 8; i++) {
+        if (!explosions[i].active) {
+            if (size == 0) {
+                size = ((rand() % 2) == 0) ? 8 : 16;
+            }
+            explosions[i].spawn(x, y, size);
+            return;
+        }
+    }
 }

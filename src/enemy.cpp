@@ -203,7 +203,9 @@ void Enemy::tick(Bullet *enemyBullets) {
         }
         applyPath(BOSS_PATH[stepPointer]);
     }
-
+    if (x < -30) {
+        despawn();
+    }
     draw();
 }
 

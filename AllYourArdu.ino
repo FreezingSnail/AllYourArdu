@@ -10,6 +10,8 @@ Arduboy2 arduboy;
 Engine engine;
 Background background;
 // ArduboyTones sound(arduboy.audio.enabled);
+uint16_t ticker;
+uint8_t frame;
 
 ArduboyPlaytune tunes(arduboy.audio.enabled);
 
@@ -26,6 +28,38 @@ void setup() {
     tunes.initChannel(PIN_SPEAKER_2);
     //  engine.enemies.sound = &sound;
     background.init();
+    ticker = 0;
+    frame = 0;
+    engine.state = GameState::OPENING;
+}
+void intro() {
+    ticker++;
+    if (ticker % 5 == 0) {
+        frame++;
+    }
+    for (uint8_t i = 0; i < 8; i++) {
+        engine.explosions[i].tick();
+    }
+
+    if (ticker == 60) {
+        engine.spawnExplode(20, 10, 8);
+    } else if (ticker == 70) {
+        engine.spawnExplode(60, 50, 8);
+    } else if (ticker == 90) {
+        engine.spawnExplode(40, 40, 8);
+    } else if (ticker == 105) {
+        engine.spawnExplode(80, 35, 8);
+    } else if (ticker == 125) {
+        engine.spawnExplode(35, 12, 8);
+    } else if (ticker == 130) {
+        engine.spawnExplode(885, 45, 8);
+    } else if (ticker == 132) {
+        engine.spawnExplode(49, 20, 8);
+    }
+
+    if (ticker == 230) {
+        engine.state = GameState::TITLE;
+    }
 }
 
 void loop() {
@@ -38,6 +72,9 @@ void loop() {
     background.tick();
 
     switch (engine.state) {
+    case GameState::OPENING:
+        intro();
+        break;
     case GameState::TITLE:
         Sprites::drawOverwrite(0, 0, Title, 0);
         if (Arduboy2::justPressed(A_BUTTON)) {
