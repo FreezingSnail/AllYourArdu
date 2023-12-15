@@ -4,7 +4,6 @@ on:
   push:
     tags:
       - v*
-    branches: [ actions ]
 
 permissions:
   contents: write
@@ -57,9 +56,6 @@ jobs:
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v3
-        
-      - name: check
-        run: ls -R
 
       - name: Upload artifacts to GitHub Releases
         env:
