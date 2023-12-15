@@ -41,8 +41,7 @@ jobs:
         run: arduino-cli lib install ArdBitmap
 
       - name: build
-        run: mkdir build
-        run: 	arduino-cli compile --fqbn "arduboy-homemade:avr:arduboy" --build-properties build.project_name=AllYourArdu.hex --output-dir build/
+        run: 	mkdir build && arduino-cli compile --fqbn "arduboy-homemade:avr:arduboy" --build-properties build.project_name=AllYourArdu.hex --output-dir build/
 
 
       - name: Upload build artifacts
