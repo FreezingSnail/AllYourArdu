@@ -52,7 +52,7 @@ jobs:
 
   release:
     name: Upload artifacts to release
-    needs: [build, build-source]
+    needs: [build]
     runs-on: ubuntu-latest
     steps:
       - name: Download artifacts
