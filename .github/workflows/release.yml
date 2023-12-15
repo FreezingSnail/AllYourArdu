@@ -55,9 +55,11 @@ jobs:
     needs: [build]
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - name: Display structure of downloaded files
-      run:  ls -R
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: build/
+        run: ls -R
 
       - name: Upload artifacts to GitHub Releases
         env:
