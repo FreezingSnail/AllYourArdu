@@ -55,12 +55,9 @@ jobs:
     needs: [build]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
-
-        with:
-          name: AllYourArdu.hex
-      - name: Display structure of downloaded files
-          run: ls -R
+    - uses: actions/download-artifact@v4
+    - name: Display structure of downloaded files
+      run: ls -R
 
       - name: Upload artifacts to GitHub Releases
         env:
