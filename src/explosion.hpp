@@ -12,7 +12,7 @@ class Explosion {
     uint8_t size;
     bool active;
 
-    void dbf spawn(uint8_t x, uint8_t y, uint8_t size) {
+    void spawn(uint8_t x, uint8_t y, uint8_t size) {
         active = true;
         this->x = x;
         this->y = y;

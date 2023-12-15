@@ -25,6 +25,7 @@ class Ship {
     int8_t powerupPointer;
     Arduboy2 *arduboy;
     Formation formation;
+    int8_t hp;
 
     void init();
     void run();

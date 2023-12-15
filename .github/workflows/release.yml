@@ -1,0 +1,75 @@
+name: Create release
+
+on:
+  push:
+    tags:
+      - v*
+
+permissions:
+  contents: write
+
+jobs:
+  Build:
+      runs-on: ubuntu-latest
+      steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Arduino CLI
+        uses: arduino/setup-arduino-cli@v1
+
+      - name: Add Arduboy board
+        run: arduino-cli config init --additional-urls https://arduboy.github.io/board-support/package_arduboy_index.json
+
+      - name: Add homemade package
+        run: arduino-cli config add board_manager.additional_urls https://raw.githubusercontent.com/MrBlinky/Arduboy-homemade-package/master/package_arduboy_homemade_index.json
+
+      - name: Update Index
+        run: arduino-cli core update-index 
+      
+      - name: install arv board
+        run: arduino-cli core install arduino:avr 
+      
+      - name: install Homemade board
+        run: arduino-cli core install arduboy-homemade:avr 
+
+      - name: Install Arduboy library
+        run: arduino-cli lib install Arduboy2
+
+      - name: Install bitmap library
+        run: arduino-cli lib install ArdBitmap
+
+      - name: build
+        run: mkdir build
+        run: 	arduino-cli compile --fqbn "arduboy-homemade:avr:arduboy" --build-properties build.project_name=AllYourArdu.hex --output-dir build/
+
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: AllYourArdu.hex
+          path: build/
+
+  release:
+    name: Upload artifacts to release
+    needs: [build, build-source]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+
+        with:
+          path: artifacts
+
+      - name: Upload artifacts to GitHub Releases
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPO: ${{ github.repository }}
+          RELEASE_ID: ${{ github.event.release.id }}
+          tag: ${{ github.ref_name }}
+        run: |
+          gh release create "$tag" \
+              --repo="$GITHUB_REPOSITORY" \
+              --title="${GITHUB_REPOSITORY#*/} ${tag#v}" \
+              --generate-notes \
+              AllYourArdu.hex

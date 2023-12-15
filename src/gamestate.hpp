@@ -5,4 +5,7 @@ enum class GameState {
     TITLE,
     GAME,
     LOSE,
+    LEVELPAUSE,
+    WIN,
+    SPLASH,
 };

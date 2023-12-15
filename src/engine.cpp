@@ -1,20 +1,36 @@
 #include "engine.hpp"
 #include "lib/bossdata.hpp"
 
+static bool isBoss(EnemyType type) {
+    switch (type) {
+    case EnemyType::BOSS_FRONT:
+    case EnemyType::BOSS_MIDDLE:
+    case EnemyType::BOSS_BACK:
+    case EnemyType::BOSSCORELONG:
+    case EnemyType::BOSSCORE:
+    case EnemyType::BOSS_BOTTOM_WING:
+    case EnemyType::BOSS_TOP_WING:
+    case EnemyType::BOSS_CORE:
+        return true;
+    }
+    return false;
+}
+
 Engine::Engine() {
     ship.playerBullets = playerBullets;
     enemies.playerBullets = playerBullets;
     state = GameState::TITLE;
+    enemies.powerups.active = false;
     ship.enemies = enemies.enemies;
     ship.state = &state;
     ship.powerup = &enemies.powerups;
     loadLevel(0);
-    // boss.load(&boss1Data);
+    // boss.load(&boss2Data);
 }
 
 void Engine::run() {
     ticker++;
-    if (ticker == pgm_read_word(&(currentLevel->waves[currentSpawnIndex]).waitTicks)) {
+    if (ticker >= pgm_read_word(&(currentLevel->waves[currentSpawnIndex]).waitTicks) && clearedEnemies()) {
         ticker = 0;
         currentSpawnIndex++;
         spawnCounter = 0;
@@ -22,10 +38,15 @@ void Engine::run() {
             EnemyType::BOSS_CORE) {
             boss.load(&boss1Data);
         }
+        if (EnemyType(pgm_read_byte(&pgm_read_pointer(&currentLevel->waves[currentSpawnIndex].spawnInstructions)->type)) ==
+            EnemyType::BOSSCORELONG) {
+            boss.load(&boss2Data);
+        }
     }
     if (EnemyType(pgm_read_byte(&pgm_read_pointer(&currentLevel->waves[currentSpawnIndex].spawnInstructions)->type)) == EnemyType::NONE &&
         clearedEnemies()) {
         currentLevelIndex++;
+        state = GameState::LEVELPAUSE;
         loadLevel(currentLevelIndex);
         return;
     }
@@ -34,9 +55,23 @@ void Engine::run() {
     ship.run();
     enemies.tick();
     bulletTick();
-    boss.tick(enemyBullets);
-    for (uint8_t i = 0; i < 8; i++) {
-        explosions[i].tick();
+    if (boss.active) {
+        boss.tick(enemyBullets);
+        for (uint8_t i = 0; i < 8; i++) {
+            explosions[i].tick();
+        }
+
+        for (uint8_t j = 0; j < BULLETCOUNT; j++) {
+
+            int8_t hit = boss.hit(playerBullets[j].getBounding());
+            if (hit >= 0) {
+                boss.enemies[hit].takeDamage(playerBullets[j].getDamage());
+                spawnExplode(playerBullets[j].x - 4, playerBullets[j].y - 4, 8);
+                playerBullets[j].reset();
+
+                break;
+            }
+        }
     }
 
     for (uint8_t i = 0; i < ENEMIES; i++) {
@@ -47,7 +82,11 @@ void Engine::run() {
         enemies.enemies[i].tick(enemyBullets);
 
         if (ship.getBound().overlap(enemies.enemies[i].getCollision())) {
-            //*state = GameState::LOSE;
+            ship.hp--;
+            enemies.enemies[i].reset();
+            if (ship.hp <= 0) {
+                // state = GameState::LOSE;
+            }
         }
 
         if (ship.lilShips[0].active && enemies.enemies[i].hit(ship.lilShips[0].getBound())) {
@@ -66,6 +105,7 @@ void Engine::run() {
                     spawnExplode(playerBullets[j].x - 4, playerBullets[j].y - 4, 0);
 
                     if (enemies.enemies[i].takeDamage(playerBullets[j].getDamage())) {
+                        enemies.powerUpSpawn(enemies.enemies[i].x, enemies.enemies[i].y);
                         // enemies.sound->tone(NOTE_E3, 40);
                         enemies.score++;
                         if (enemies.enemies[i].type == EnemyType::WALL) {
@@ -84,51 +124,46 @@ void Engine::run() {
             }
         }
     }
-    if (boss.active) {
-        for (uint8_t j = 0; j < BULLETCOUNT; j++) {
 
-            int8_t hit = boss.hit(playerBullets[j].getBounding());
-            if (hit >= 0) {
-                boss.enemies[hit].takeDamage(playerBullets[j].getDamage());
-                spawnExplode(playerBullets[j].x - 4, playerBullets[j].y - 4, 8);
-                playerBullets[j].reset();
-
-                break;
+    for (uint8_t i = 0; i < 6; i++) {
+        if (!boss.enemies[i].active) {
+            continue;
+        }
+        if (ship.getBound().overlap(boss.enemies[i].getCollision())) {
+            ship.hp--;
+            enemies.enemies[i].reset();
+            if (ship.hp <= 0) {
+                // state = GameState::LOSE;
             }
         }
 
-        for (uint8_t i = 0; i < 6; i++) {
-            if (!boss.enemies[i].active) {
-                continue;
-            }
-            if (ship.getBound().overlap(boss.enemies[i].getCollision())) {
-                //*state = GameState::LOSE;
-            }
+        if (ship.lilShips[0].active && boss.enemies[i].hit(ship.lilShips[0].getBound())) {
+            ship.lilShips[0].despawn();
+            // enemies.enemies[i].takeDamage(-5);
+        }
 
-            if (ship.lilShips[0].active && boss.enemies[i].hit(ship.lilShips[0].getBound())) {
-                ship.lilShips[0].despawn();
-                // enemies.enemies[i].takeDamage(-5);
-            }
-
-            if (ship.lilShips[1].active && boss.enemies[i].hit(ship.lilShips[1].getBound())) {
-                ship.lilShips[1].despawn();
-                // enemies.enemies[i].takeDamage(-5);
-            }
+        if (ship.lilShips[1].active && boss.enemies[i].hit(ship.lilShips[1].getBound())) {
+            ship.lilShips[1].despawn();
+            // enemies.enemies[i].takeDamage(-5);
         }
     }
 }
 
 void Engine::restart() {
-    if (Arduboy2::justPressed(A_BUTTON)) {
-        state = GameState::TITLE;
-        for (uint8_t i = 0; i < BULLETCOUNT; i++) {
-            playerBullets[i].active = false;
-        }
-        for (uint8_t i = 0; i < ENEMIES; i++) {
-            enemies.enemies[i].active = false;
-        }
-        enemies.score = 0;
+    currentSpawnIndex = 0;
+    spawnCounter = 0;
+    currentLevelIndex = 0;
+    ship.init();
+    for (uint8_t i = 0; i < BULLETCOUNT; i++) {
+        playerBullets[i].active = false;
     }
+    for (uint8_t i = 0; i < ENEMIES; i++) {
+        enemies.enemies[i].active = false;
+    }
+    for (uint8_t i = 0; i < 6; i++) {
+        boss.enemies[i].active = false;
+    }
+    enemies.score = 0;
 }
 
 void Engine::loadLevel(uint8_t level) {
@@ -138,12 +173,16 @@ void Engine::loadLevel(uint8_t level) {
 }
 
 void Engine::spawn() {
+    EnemyType t = EnemyType(pgm_read_byte(&pgm_read_pointer(&currentLevel->waves[currentSpawnIndex].spawnInstructions)->type));
+    if (isBoss(t)) {
+        return;
+    }
     uint16_t wait = pgm_read_byte(&pgm_read_pointer(&currentLevel->waves[currentSpawnIndex].spawnInstructions)->tickInterval);
     uint8_t total = pgm_read_byte(&pgm_read_pointer(&currentLevel->waves[currentSpawnIndex].spawnInstructions)->count);
     if (ticker % wait == 0 && spawnCounter < total) {
 
-        enemies.spawn(EnemyType(pgm_read_byte(&pgm_read_pointer(&currentLevel->waves[currentSpawnIndex].spawnInstructions)->type)),
-                      pgm_read_byte(&currentLevel->waves[currentSpawnIndex].x), pgm_read_byte(&currentLevel->waves[currentSpawnIndex].y));
+        enemies.spawn(t, pgm_read_byte(&currentLevel->waves[currentSpawnIndex].x),
+                      pgm_read_byte(&currentLevel->waves[currentSpawnIndex].y));
         spawnCounter++;
     }
 }
@@ -153,7 +192,11 @@ void Engine::bulletTick() {
         enemyBullets[i].tick();
 
         if (enemyBullets[i].getBounding().overlap(ship.getBound())) {
-            // player hit
+            ship.hp--;
+            enemies.enemies[i].reset();
+            if (ship.hp <= 0) {
+                // state = GameState::LOSE;
+            }
             enemyBullets[i].reset();
         } else if (ship.lilShips[0].active && enemyBullets[i].getBounding().overlap(ship.lilShips[0].getBound())) {
             ship.lilShips[0].despawn();
@@ -168,10 +211,14 @@ void Engine::bulletTick() {
 }
 
 bool Engine::clearedEnemies() {
-    for (uint8_t i = 0; i < ENEMIES; i++) {
-        if (enemies.enemies[i].active) {
-            return false;
+    if (!boss.active) {
+        for (uint8_t i = 0; i < ENEMIES; i++) {
+            if (enemies.enemies[i].active) {
+                return false;
+            }
         }
+    } else {
+        return !boss.bossActive();
     }
 
     return true;

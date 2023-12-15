@@ -73,7 +73,7 @@ void Bullet::applyPath(Path p) {
     y += (yMod * p.yMod);
 }
 
-void dbf Bullet::start(uint8_t x, uint8_t y, uint8_t type, int8_t xMod, int8_t yMod) {
+void Bullet::start(uint8_t x, uint8_t y, uint8_t type, int8_t xMod, int8_t yMod) {
     active = true;
     this->x = x;
     this->y = y;

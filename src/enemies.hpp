@@ -18,4 +18,5 @@ class Enemies {
     void tick();
     void spawn(EnemyType type, uint8_t x, uint8_t y);
     void spawnBrokenWall(EnemyType type, int16_t x, int16_t y, uint16_t stepCounter, uint8_t stepPointer);
+    void powerUpSpawn(uint8_t x, uint8_t y);
 };

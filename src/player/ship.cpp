@@ -26,13 +26,11 @@ void Ship::init() {
     this->y = 10;
     this->suby = 10 * SUBPIXELMOD;
     this->subx = 10 * SUBPIXELMOD;
-    this->pushPower(ShipType::MINI);
-    this->pushPower(ShipType::ROD);
-    this->pushPower(ShipType::EYE);
-    this->pushPower(ShipType::BOMB);
 
     lilShips[0].spawn(&x, &y, 0, -10);
     lilShips[1].spawn(&x, &y, 0, 18);
+
+    hp = 10;
 }
 
 void Ship::run() {
@@ -67,14 +65,14 @@ void Ship::run() {
 }
 void Ship::draw() {
     Sprites::drawOverwrite(x, y, mainship, frame);
-    arduboy->setCursor(20, 0);
+    arduboy->setCursor(30, 0);
     arduboy->print(F("P:"));
     for (uint8_t i = 0; i <= powerupPointer; i++) {
         printPowerUp(*arduboy, powerups[i]);
     }
 }
 
-void dbf Ship::move() {
+void Ship::move() {
     if (Arduboy2::pressed(LEFT_BUTTON)) {
         subx--;
     }
@@ -168,6 +166,7 @@ void Ship::pushPower(ShipType type) {
     }
     powerupPointer++;
     powerups[powerupPointer] = type;
+    hp += 3;
 }
 void Ship::popPower() {
     ShipType type = powerups[0];

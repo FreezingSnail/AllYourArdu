@@ -16,10 +16,36 @@ struct Level {
 
 const Level l1 PROGMEM = {
     {{&lineSpiral, 500, 130, 30},
+     {&Ovals, 240, 130, 30},
+     {&Ovals, 240, 130, 20},
+     {&Ovals, 240, 130, 40},
+     {&lineSpiral, 500, 130, 30},
+     {&Ovals, 240, 130, 30},
+     {&Ovals, 240, 130, 20},
+     {&Ovals, 240, 130, 40},
+     {&Carrier, 500, 130, 12},
+     {&emptySpawn, 0, 250, 250}},
+};
+
+const Level l2 PROGMEM = {
+    {{&lineSpiral, 500, 130, 30},
      {&Ovals, 500, 130, 30},
      {&SmallShips, 500, 130, 30},
      {&WallEnemy, 1000, 130, 21},
-     {&Carrier, 500, 130, 30},
+     {&Carrier, 500, 130, 15},
+     {&BossLong, 3000, 128, 15},
+     {&emptySpawn, 0, 250, 250},
+     {&emptySpawn, 0, 250, 250},
+     {&emptySpawn, 0, 250, 250},
+     {&emptySpawn, 0, 250, 250}},
+};
+
+const Level l3 PROGMEM = {
+    {{&lineSpiral, 500, 130, 30},
+     {&Ovals, 500, 130, 30},
+     {&SmallShips, 500, 130, 30},
+     {&WallEnemy, 1000, 130, 21},
+     {&Carrier, 500, 130, 15},
      {&Boss, 3000, 128, 15},
      {&emptySpawn, 0, 250, 250},
      {&emptySpawn, 0, 250, 250},
@@ -27,7 +53,7 @@ const Level l1 PROGMEM = {
      {&emptySpawn, 0, 250, 250}},
 };
 
-const Level DebugL PROGMEM = {{{&Boss, 3000, 128, 15},   //{&WallEnemy, 1000, 130, 21},
+const Level DebugL PROGMEM = {{{&WallEnemy, 3000, 128, 15},   //{&WallEnemy, 1000, 130, 21},
                                {&emptySpawn, 0, 250, 250},
                                {&emptySpawn, 0, 250, 250},
                                {&emptySpawn, 0, 250, 250},
@@ -39,6 +65,8 @@ const Level DebugL PROGMEM = {{{&Boss, 3000, 128, 15},   //{&WallEnemy, 1000, 13
 const Level *const levels[] PROGMEM = {
     //&DebugL,
     &l1,
+    &l2,
+    &l3,
 };
 
 template <typename T> T *pgm_read_pointer(T *const *pointer) {

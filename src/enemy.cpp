@@ -13,13 +13,24 @@ static int16_t getHitPoints(EnemyType type) {
     case EnemyType::SPIRAL:
         return 1;
     case EnemyType::OVAL:
-        return 1;
+        return 2;
     case EnemyType::SMALLSHIP:
-        return 3;
+        return 10;
     case EnemyType::CARRIER:
-        return 40;
+        return 120;
     case EnemyType::WALL:
-        return 90;
+        return 200;
+
+    case EnemyType::BOSS_BOTTOM_WING:
+    case EnemyType::BOSS_TOP_WING:
+    case EnemyType::BOSS_FRONT:
+    case EnemyType::BOSS_MIDDLE:
+    case EnemyType::BOSS_BACK:
+        return 400;
+
+    case EnemyType::BOSSCORE:
+    case EnemyType::BOSSCORELONG:
+        return 200;
 
     case EnemyType::BROKEN_WALL_BOTTOM:
     case EnemyType::BROKEN_WALL_TOP:
@@ -41,11 +52,14 @@ static int16_t getSubMod(EnemyType type) {
     case EnemyType::BOSS_TOP_WING:
     case EnemyType::BOSS_CORE:
     case EnemyType::BOSSCORE:
+    case EnemyType::BOSSCORELONG:
+
         return 4;
 
     case EnemyType::WALL:
         return 12;
     }
+    return 4;
 }
 
 bool Enemy::shoot() {
@@ -55,6 +69,8 @@ bool Enemy::shoot() {
     case EnemyType::BOSS_BOTTOM_WING:
     case EnemyType::BOSS_TOP_WING:
     case EnemyType::BOSSCORE:
+    case EnemyType::BOSSCORELONG:
+    case EnemyType::SMALLSHIP:
         return true;
     }
     return false;
@@ -85,8 +101,16 @@ void Enemy::blink() {
         Sprites::drawErase(x, y, gateEnemy, 1);
         break;
     case EnemyType::BOSSCORE:
+    case EnemyType::BOSSCORELONG:
+
         Sprites::drawErase(x, y, sprite, 0);
         break;
+    case EnemyType::BOSS_FRONT:
+    case EnemyType::BOSS_MIDDLE:
+    case EnemyType::BOSS_BACK:
+        Sprites::drawErase(x, y, sprite, 0 + spriteMod);
+        break;
+
     default:
         Sprites::drawErase(x, y, sprite, (3 * frame) + spriteMod);
         break;
@@ -123,7 +147,14 @@ void Enemy::draw() {
         Sprites::drawSelfMasked(x, y, gateEnemy, 2);
         break;
     case EnemyType::BOSSCORE:
+    case EnemyType::BOSSCORELONG:
+
         Sprites::drawOverwrite(x + (frame % 2), y, sprite, 0);
+        break;
+    case EnemyType::BOSS_FRONT:
+    case EnemyType::BOSS_MIDDLE:
+    case EnemyType::BOSS_BACK:
+        Sprites::drawOverwrite(x, y, sprite, spriteMod);
         break;
 
     default:
@@ -136,16 +167,9 @@ void Enemy::applyPath(Path p) {
     subx -= p.xMod;
     suby -= p.yMod;
 
-    if (subx >= ((128 * SUBPIXELMOD) - (16 * SUBPIXELMOD))) {
-        subx = ((128 * SUBPIXELMOD) - (16 * SUBPIXELMOD));
-    }
-    if (suby >= ((64 * SUBPIXELMOD) - (16 * SUBPIXELMOD))) {
-        suby = ((64 * SUBPIXELMOD) - (16 * SUBPIXELMOD));
-    }
-
     x = subx / SUBPIXELMOD;
     y = suby / SUBPIXELMOD;
-    if (subx % SUBPIXELMOD == 0) {
+    if (ticker % SUBPIXELMOD == 0) {
         stepCount++;
     }
 }
@@ -190,7 +214,7 @@ void Enemy::tick(Bullet *enemyBullets) {
         applyPath(WAVE_PATH[stepPointer]);
         break;
     case Pattern::HOLD:
-        if (stepCount > WALL_PATH[stepPointer].stepCount) {
+        if (stepCount > WALL_PATH[stepPointer].stepCount && stepCount < 2) {
             stepCount = 0;
             stepPointer++;
         }
@@ -202,6 +226,12 @@ void Enemy::tick(Bullet *enemyBullets) {
             stepPointer++;
         }
         applyPath(BOSS_PATH[stepPointer]);
+    case Pattern::BOSSLONG:
+        if (stepCount > BOSSLONG_PATH[stepPointer].stepCount) {
+            stepCount = 0;
+            stepPointer++;
+        }
+        applyPath(BOSSLONG_PATH[stepPointer]);
     }
     if (x < -30) {
         despawn();
@@ -209,7 +239,7 @@ void Enemy::tick(Bullet *enemyBullets) {
     draw();
 }
 
-void dbf Enemy::spawn(EnemyType type, int16_t x, int16_t y) {
+void Enemy::spawn(EnemyType type, int16_t x, int16_t y) {
     this->y = y;
     this->x = x;
     active = true;
@@ -223,9 +253,8 @@ void dbf Enemy::spawn(EnemyType type, int16_t x, int16_t y) {
     suby = y * SUBPIXELMOD;
 }
 
-void dbf Enemy::spawn(EnemyType type, int16_t x, int16_t y, uint16_t hp, uint8_t *sprite, uint8_t spriteMod) {
+void Enemy::spawn(EnemyType type, int16_t x, int16_t y, uint16_t hp, uint8_t *sprite, uint8_t spriteMod) {
     spawn(type, x, y);
-    hitCounter = hp;
     this->sprite = sprite;
     this->spriteMod = spriteMod;
 }
@@ -259,9 +288,16 @@ BoundBox Enemy::getBounding() {
         return BoundBox(x, 0, 30, 22);
     case EnemyType::BOSSCORE:
         return BoundBox(x + 1, y + 1, 6, 6);
+    case EnemyType::BOSSCORELONG:
+        return BoundBox(x - 3, y, 6, 8);
+
     case EnemyType::BOSS_BOTTOM_WING:
     case EnemyType::BOSS_TOP_WING:
         return BoundBox(x + 15, y, 15, 22);
+    case EnemyType::BOSS_FRONT:
+    case EnemyType::BOSS_MIDDLE:
+    case EnemyType::BOSS_BACK:
+        return BoundBox(x, y, 24, 24);
     }
     return BoundBox(0, 0, 0, 0);
 }
@@ -280,7 +316,7 @@ bool Enemy::hit(BoundBox bulletBox) {
 }
 
 bool Enemy::takeDamage(uint8_t damage) {
-    if (hitCounter < 0) {
+    if (hitCounter < 0 || x > 101) {
         return false;
     }
     blink();
@@ -292,7 +328,7 @@ bool Enemy::takeDamage(uint8_t damage) {
     return false;
 }
 
-void dbf Enemy::reset() {
+void Enemy::reset() {
     // x = 160;
     active = false;
 }
@@ -319,6 +355,7 @@ void Enemy::bullet(Bullet *enemyBullets) {
         tickerMod = 240;
         break;
     case EnemyType::BOSSCORE:
+    case EnemyType::BOSSCORELONG:
     default:
         xS = this->x;
         yS = this->y + 4;

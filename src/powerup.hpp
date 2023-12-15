@@ -24,6 +24,9 @@ class PowerUp {
     };
 
     void draw() {
+        if (!active) {
+            return;
+        }
         Sprites::drawSelfMasked(x, y, powerups, uint8_t(type));
     };
 

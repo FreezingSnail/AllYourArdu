@@ -19,6 +19,6 @@ class BossEnemy {
 
     void load(BossData *const data);
     int8_t hit(BoundBox bounds);
-    void blink();
     void tick(Bullet *enemyBullets);
+    bool bossActive();
 };

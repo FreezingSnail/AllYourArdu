@@ -39,7 +39,7 @@ void LilShip::spawn(uint8_t *xRoot, uint8_t *yRoot, int8_t xMod, int8_t yMod) {
     this->yMod = yMod;
 }
 
-void dbf LilShip::despawn() {
+void LilShip::despawn() {
     this->active = false;
 }
 
