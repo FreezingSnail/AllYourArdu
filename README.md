@@ -11,6 +11,7 @@ SHMUP game for the Arduboy meme jam with references to Zero Wing
 - Score displayed on top left corner
 - Powerup stash displayed in the center
 - Player health on the top right
+- Powerups restore health and drop randomly on enemy death
 
 ## Controls
 - + to move
