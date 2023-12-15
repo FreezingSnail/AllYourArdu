@@ -85,7 +85,7 @@ void Engine::run() {
             ship.hp--;
             enemies.enemies[i].reset();
             if (ship.hp <= 0) {
-                // state = GameState::LOSE;
+                state = GameState::LOSE;
             }
         }
 
@@ -133,7 +133,7 @@ void Engine::run() {
             ship.hp--;
             enemies.enemies[i].reset();
             if (ship.hp <= 0) {
-                // state = GameState::LOSE;
+                state = GameState::LOSE;
             }
         }
 
@@ -195,7 +195,7 @@ void Engine::bulletTick() {
             ship.hp--;
             enemies.enemies[i].reset();
             if (ship.hp <= 0) {
-                // state = GameState::LOSE;
+                state = GameState::LOSE;
             }
             enemyBullets[i].reset();
         } else if (ship.lilShips[0].active && enemyBullets[i].getBounding().overlap(ship.lilShips[0].getBound())) {
