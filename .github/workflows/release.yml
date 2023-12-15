@@ -40,26 +40,22 @@ jobs:
         run: arduino-cli lib install ArdBitmap
 
       - name: build
-        run: mkdir build
-        run: 	arduino-cli compile --fqbn "arduboy-homemade:avr:arduboy" --build-properties build.project_name=AllYourArdu.hex --output-dir build/
+        run: 	mkdir build && arduino-cli compile --fqbn "arduboy-homemade:avr:arduboy" --build-properties build.project_name=AllYourArdu --output-dir build/
 
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: AllYourArdu.hex
+          name: AllYourArdu
           path: build/
 
   release:
     name: Upload artifacts to release
-    needs: [build, build-source]
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@v4
-
-        with:
-          path: artifacts
+        uses: actions/download-artifact@v3
 
       - name: Upload artifacts to GitHub Releases
         env:
@@ -72,4 +68,4 @@ jobs:
               --repo="$GITHUB_REPOSITORY" \
               --title="${GITHUB_REPOSITORY#*/} ${tag#v}" \
               --generate-notes \
-              AllYourArdu.hex
+              AllYourArdu/AllYourArdu.hex
