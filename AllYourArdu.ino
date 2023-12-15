@@ -15,6 +15,7 @@ Background background;
 // ArduboyTones sound(arduboy.audio.enabled);
 uint16_t ticker;
 uint8_t frame;
+uint8_t cheat;
 
 ArduboyPlaytune tunes(arduboy.audio.enabled);
 
@@ -34,6 +35,7 @@ void setup() {
     arduboy.initRandomSeed();
 
     engine.ship.arduboy = &arduboy;
+    engine.ship.init();
     tunes.initChannel(PIN_SPEAKER_1);
     tunes.initChannel(PIN_SPEAKER_2);
     //  engine.enemies.sound = &sound;
@@ -127,9 +129,16 @@ void loop() {
         }
         if (Arduboy2::justPressed(A_BUTTON)) {
             engine.state = GameState::LEVELPAUSE;
-            engine.ship.init();
-
             return;
+        }
+        if (Arduboy2::justPressed(LEFT_BUTTON)) {
+            cheat++;
+            if (cheat == 5) {
+                engine.ship.hp = 100;
+            }
+            if (cheat == 25) {
+                engine.ship.hp = 999;
+            }
         }
         break;
 
@@ -180,9 +189,10 @@ void loop() {
         Arduboy2::setCursor(30, 40);
         arduboy.print(F("SCORE: "));
         arduboy.println(engine.enemies.score);
-        engine.restart();
+
         if (Arduboy2::justPressed(A_BUTTON)) {
             engine.state = GameState::TITLE;
+            engine.restart();
         }
         break;
     }

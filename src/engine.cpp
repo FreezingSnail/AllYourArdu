@@ -46,6 +46,10 @@ void Engine::run() {
     if (EnemyType(pgm_read_byte(&pgm_read_pointer(&currentLevel->waves[currentSpawnIndex].spawnInstructions)->type)) == EnemyType::NONE &&
         clearedEnemies()) {
         currentLevelIndex++;
+        if (currentLevelIndex == 10) {
+            state = GameState::WIN;
+            return;
+        }
         state = GameState::LEVELPAUSE;
         loadLevel(currentLevelIndex);
         return;
@@ -83,7 +87,11 @@ void Engine::run() {
 
         if (ship.getBound().overlap(enemies.enemies[i].getCollision())) {
             ship.hp--;
-            enemies.enemies[i].reset();
+            ship.x -= 5;
+            ship.subx -= 20;
+            if (hitable(enemies.enemies[i].type)) {
+                enemies.enemies[i].reset();
+            }
             if (ship.hp <= 0) {
                 state = GameState::LOSE;
             }
@@ -153,7 +161,9 @@ void Engine::restart() {
     currentSpawnIndex = 0;
     spawnCounter = 0;
     currentLevelIndex = 0;
+    boss.active = false;
     ship.init();
+    // ship.init();
     for (uint8_t i = 0; i < BULLETCOUNT; i++) {
         playerBullets[i].active = false;
     }
@@ -168,6 +178,7 @@ void Engine::restart() {
 
 void Engine::loadLevel(uint8_t level) {
     currentLevel = pgm_read_pointer(&levels[level]);
+    boss.active = false;
     ticker = 0;
     currentSpawnIndex = 0;
 }
@@ -238,4 +249,22 @@ void Engine::spawnExplode(uint8_t x, uint8_t y, uint8_t size) {
             return;
         }
     }
+}
+
+bool hitDie(EnemyType t) {
+    switch (t) {
+    case EnemyType::WALL:
+    case EnemyType::BROKEN_WALL_TOP:
+    case EnemyType::BROKEN_WALL_BOTTOM:
+    case EnemyType::BOSSCORE:
+    case EnemyType::BOSSCORELONG:
+    case EnemyType::BOSS_FRONT:
+    case EnemyType::BOSS_MIDDLE:
+    case EnemyType::BOSS_BACK:
+    case EnemyType::BOSS_BOTTOM_WING:
+    case EnemyType::BOSS_TOP_WING:
+    case EnemyType::CARRIER:
+        return false;
+    }
+    return true;
 }

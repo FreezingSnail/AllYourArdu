@@ -21,7 +21,7 @@ static void printPowerUp(Arduboy2 &arduboy, ShipType type) {
 }
 
 void Ship::init() {
-    this->powerupPointer--;
+    this->powerupPointer = -1;
     this->x = 10;
     this->y = 10;
     this->suby = 10 * SUBPIXELMOD;

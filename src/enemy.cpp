@@ -17,7 +17,7 @@ static int16_t getHitPoints(EnemyType type) {
     case EnemyType::SMALLSHIP:
         return 10;
     case EnemyType::CARRIER:
-        return 120;
+        return 240;
     case EnemyType::WALL:
         return 200;
 
@@ -316,7 +316,10 @@ bool Enemy::hit(BoundBox bulletBox) {
 }
 
 bool Enemy::takeDamage(uint8_t damage) {
-    if (hitCounter < 0 || x > 101) {
+    if (hitCounter < 0) {
+        return false;
+    }
+    if (type == EnemyType::CARRIER && x > 80) {
         return false;
     }
     blink();
