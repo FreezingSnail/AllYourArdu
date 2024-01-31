@@ -15,7 +15,7 @@ Enemies::Enemies() {
 
 void Enemies::tick() {
     ticker++;
-    if (ticker % 60 == 0) {
+    if (ticker % 60 == 0 && powerups.active) {
         powerups.powerupTimer++;
     }
     if (powerups.powerupTimer > 7) {
