@@ -77,6 +77,22 @@ void intro() {
     }
 }
 
+void instructions() {
+    if (arduboy.justPressed(B_BUTTON)) {
+        engine.state = GameState::TITLE;
+    }
+
+    arduboy.setCursor(0, 0);
+    arduboy.println(F("A to shoot"));
+    arduboy.println(F("B changes formation"));
+    arduboy.println(F("\x1B & \x1A uses powerups"));
+    arduboy.println(F("\x18 toggles sound"));
+    arduboy.println(F("powerups heal you"));
+    arduboy.println(F("try hitting left on"));
+    arduboy.println(F("the menu a few times"));
+    arduboy.println(F("if it's too hard"));
+}
+
 void loop() {
     if (!arduboy.nextFrame()) {
         return;
@@ -112,7 +128,9 @@ void loop() {
         Sprites::drawSelfMasked(81, 0, TitleText, 1);
 
         Arduboy2::setCursor(0, 55);
-        arduboy.print(F("up to toggle sound "));
+        arduboy.print(F("B for help "));
+        Arduboy2::setCursor(85, 55);
+        arduboy.print(F("sound:"));
         if (sound) {
             arduboy.print(F("+"));
         } else {
@@ -129,6 +147,10 @@ void loop() {
         }
         if (Arduboy2::justPressed(A_BUTTON)) {
             engine.state = GameState::LEVELPAUSE;
+            return;
+        }
+        if (Arduboy2::justPressed(B_BUTTON)) {
+            engine.state = GameState::INSTRUCTIONS;
             return;
         }
         if (Arduboy2::justPressed(LEFT_BUTTON)) {
@@ -194,6 +216,9 @@ void loop() {
             engine.state = GameState::TITLE;
             engine.restart();
         }
+        break;
+    case GameState::INSTRUCTIONS:
+        instructions();
         break;
     }
 

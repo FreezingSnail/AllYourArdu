@@ -8,4 +8,5 @@ enum class GameState {
     LEVELPAUSE,
     WIN,
     SPLASH,
+    INSTRUCTIONS,
 };
