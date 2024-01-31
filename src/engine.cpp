@@ -85,10 +85,9 @@ void Engine::run() {
 
         enemies.enemies[i].tick(enemyBullets);
 
-        if (ship.getBound().overlap(enemies.enemies[i].getCollision())) {
+        if (ship.getBound().overlap(enemies.enemies[i].getCollision()) && ship.hitCounter == 0) {
             ship.hp--;
-            ship.x -= 5;
-            ship.subx -= 20;
+            ship.hitCounter = 10;
             if (hitable(enemies.enemies[i].type)) {
                 enemies.enemies[i].reset();
             }

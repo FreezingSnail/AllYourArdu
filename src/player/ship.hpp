@@ -26,6 +26,7 @@ class Ship {
     Arduboy2 *arduboy;
     Formation formation;
     int16_t hp;
+    uint8_t hitCounter;
 
     void init();
     void run();
@@ -38,4 +39,5 @@ class Ship {
     void pushPower(ShipType type);
     void popPower();
     void formChange();
+    void blink();
 };

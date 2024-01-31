@@ -16,7 +16,10 @@ Enemies::Enemies() {
 void Enemies::tick() {
     ticker++;
     if (ticker % 60 == 0) {
-        powerupTimer++;
+        powerups.powerupTimer++;
+    }
+    if (powerups.powerupTimer > 7) {
+        powerups.despawn();
     }
 
     powerups.draw();

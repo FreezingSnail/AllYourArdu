@@ -16,6 +16,7 @@ Background background;
 uint16_t ticker;
 uint8_t frame;
 uint8_t cheat;
+int8_t menuPage = 0;
 
 ArduboyPlaytune tunes(arduboy.audio.enabled);
 
@@ -81,16 +82,47 @@ void instructions() {
     if (arduboy.justPressed(B_BUTTON)) {
         engine.state = GameState::TITLE;
     }
-
     arduboy.setCursor(0, 0);
-    arduboy.println(F("A to shoot"));
-    arduboy.println(F("B changes formation"));
-    arduboy.println(F("\x1B & \x1A uses powerups"));
-    arduboy.println(F("\x18 toggles sound"));
-    arduboy.println(F("powerups heal you"));
-    arduboy.println(F("try hitting left on"));
-    arduboy.println(F("the menu a few times"));
-    arduboy.println(F("if it's too hard"));
+
+    if (menuPage == 0) {
+        arduboy.println(F("A to shoot"));
+        arduboy.println(F("B changes formation"));
+        arduboy.println(F("A&B to pause"));
+        arduboy.println(F("\x1B&\x1A uses powerups"));
+
+        arduboy.setCursor(0, 55);
+        arduboy.println(F("press \x19 for more"));
+    } else if (menuPage == 1) {
+        arduboy.println(F("powerups heal you"));
+        arduboy.println(F("when picked up"));
+        arduboy.println(F("\x18 toggles sound on"));
+        arduboy.println(F("the title screen"));
+
+        arduboy.setCursor(0, 55);
+        arduboy.println(F("press \x18 or \x19 for more"));
+    } else {
+        arduboy.println(F("try hitting left on"));
+        arduboy.println(F("the menu a few times"));
+        arduboy.println(F("if it's too hard"));
+        arduboy.println(F("You'll see a change"));
+        arduboy.println(F("maybe there's more..."));
+
+        arduboy.setCursor(0, 55);
+        arduboy.println(F("press \x18 for more"));
+    }
+
+    if (arduboy.justPressed(UP_BUTTON)) {
+        menuPage--;
+        if (menuPage < 0) {
+            menuPage = 0;
+        }
+    }
+    if (arduboy.justPressed(DOWN_BUTTON)) {
+        menuPage++;
+        if (menuPage > 2) {
+            menuPage = 2;
+        }
+    }
 }
 
 void loop() {
@@ -136,6 +168,13 @@ void loop() {
         } else {
             arduboy.print(F("-"));
         }
+        if (cheat >= 5 && cheat < 25) {
+            Arduboy2::setCursor(118, 5);
+            arduboy.print(F("\x02"));
+        } else if (cheat >= 25) {
+            Arduboy2::setCursor(118, 5);
+            arduboy.print(F("\x2a"));
+        }
         if (Arduboy2::justPressed(UP_BUTTON)) {
             sound = !sound;
         }
@@ -156,10 +195,10 @@ void loop() {
         if (Arduboy2::justPressed(LEFT_BUTTON)) {
             cheat++;
             if (cheat == 5) {
-                engine.ship.hp = 100;
+                engine.ship.hp = 50;
             }
             if (cheat == 25) {
-                engine.ship.hp = 999;
+                engine.ship.hp = 200;
             }
         }
         break;
@@ -167,6 +206,9 @@ void loop() {
     case GameState::GAME:
         if (!tunes.playing() && sound) {
             tunes.playScore(score);
+        }
+        if (Arduboy2::justPressed(A_BUTTON) && Arduboy2::justPressed(B_BUTTON)) {
+            engine.state = GameState::LEVELPAUSE;
         }
         Arduboy2::setCursor(0, 0);
         arduboy.print(F("S:"));
@@ -196,9 +238,9 @@ void loop() {
         Arduboy2::setCursor(30, 40);
         arduboy.print(F("SCORE: "));
         arduboy.println(engine.enemies.score);
-        engine.restart();
         if (Arduboy2::justPressed(A_BUTTON)) {
             engine.state = GameState::TITLE;
+            engine.restart();
         }
         break;
     case GameState::WIN:

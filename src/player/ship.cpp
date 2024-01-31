@@ -26,6 +26,7 @@ void Ship::init() {
     this->y = 10;
     this->suby = 10 * SUBPIXELMOD;
     this->subx = 10 * SUBPIXELMOD;
+    hitCounter = 0;
 
     lilShips[0].spawn(&x, &y, 0, -10);
     lilShips[1].spawn(&x, &y, 0, 18);
@@ -36,6 +37,7 @@ void Ship::init() {
 void Ship::run() {
     ticker++;
     if (ticker % 5 == 0) {
+
         lilframe++;
         if (lilframe > 3) {
             lilframe = 0;
@@ -44,6 +46,10 @@ void Ship::run() {
             frame = 1;
         } else {
             frame = 0;
+        }
+
+        if (hitCounter > 0) {
+            hitCounter--;
         }
     }
 
@@ -65,10 +71,19 @@ void Ship::run() {
 }
 void Ship::draw() {
     Sprites::drawOverwrite(x, y, mainship, frame);
+    blink();
     arduboy->setCursor(30, 0);
     arduboy->print(F("P:"));
     for (uint8_t i = 0; i <= powerupPointer; i++) {
         printPowerUp(*arduboy, powerups[i]);
+    }
+}
+
+void Ship::blink() {
+    if (hitCounter > 0) {
+        if (ticker % 5 == 0) {
+            Sprites::drawErase(x, y, mainship, frame);
+        }
     }
 }
 

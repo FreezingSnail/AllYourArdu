@@ -9,6 +9,7 @@ class PowerUp {
     uint8_t x, y;
     bool active;
     ShipType type;
+    uint8_t powerupTimer;
 
     void spawn(uint8_t x, uint8_t y, uint8_t type) {
         this->x = x;
@@ -21,6 +22,7 @@ class PowerUp {
         x = 0;
         y = 240;
         active = false;
+        powerupTimer = 0;
     };
 
     void draw() {
